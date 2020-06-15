@@ -1,0 +1,7 @@
+[
+{
+  "directory": "/home/autumn/scratch/yeet/build",
+  "command": "g++-10   -I/home/autumn/scratch/yeet/include    -fcoroutines -std=gnu++2a -o CMakeFiles/main.dir/main.cpp.o -c /home/autumn/scratch/yeet/main.cpp",
+  "file": "/home/autumn/scratch/yeet/main.cpp"
+}
+]
