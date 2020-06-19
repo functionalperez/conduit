@@ -27,7 +27,7 @@ struct generator_promise {
 
     using handle = std::coroutine_handle<generator_promise>;
     using return_object = ReturnObject_t<generator_promise>;
-    T current_value;
+    T value;
     static auto get_return_object_on_allocation_failure() noexcept {
         return return_object{nullptr};
     }
@@ -45,7 +45,7 @@ struct generator_promise {
     [[noreturn]] void unhandled_exception() noexcept { std::terminate(); }
     constexpr void return_void() noexcept {}
     constexpr auto yield_value(T value) noexcept(assign_T_noexcept) {
-        current_value = value;
+        this->value = std::move(value);
         return std::suspend_always{};
     }
 };

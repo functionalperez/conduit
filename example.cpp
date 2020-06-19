@@ -14,7 +14,7 @@ generator_handle<int> counter(int initial, int max, int inc) {
 void example1() {
     auto countBy3 = counter(0, 30, 3);
     for (; !countBy3.done(); countBy3.resume()) {
-        std::cout << countBy3->current_value << ' ';
+        std::cout << countBy3->value << ' ';
     }
     std::cout << '\n';
 }
