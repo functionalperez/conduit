@@ -1,11 +1,18 @@
+#pragma once
 #include <common.hpp>
+#include <iterator.hpp>
 
 template <class Promise>
 struct unique_handle : private std::coroutine_handle<Promise> {
+   private:
+    static Promise& declPromise();
+   public:
     constexpr static bool is_noexcept = Promise::is_noexcept;
     using promise_type = Promise;
     using base_type = std::coroutine_handle<Promise>;
     using handle = std::coroutine_handle<Promise>;
+    constexpr static bool suspends_initially 
+        = std::is_same_v<std::suspend_always, decltype(declPromise().initial_suspend())>;
 
     // Returns true if the coroutine handle isn't null
     using base_type::operator bool;
@@ -86,3 +93,18 @@ struct unique_handle : private std::coroutine_handle<Promise> {
     // Accesses the coroutine promise
     promise_type* operator->() noexcept { return &base_type::promise(); }
 };
+
+template<class T>
+auto begin(unique_handle<T>& p) {
+    // If the coroutine handle always suspends initially, we need to resume it when we begin
+    if constexpr(unique_handle<T>::suspends_initially) {
+        p.resume();
+    }
+    return coro_iterator{p.get()};
+}
+template<class T>
+auto end(unique_handle<T>& p) {
+    // coro_sentinal is just used to proivide an overload for coro_iterator::operator==
+    // so it doesn't need to contain any information about the coroutine handle
+    return coro_sentinal{};
+}
