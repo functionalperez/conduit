@@ -5,7 +5,7 @@
 
 struct generator_sentinal {};
 
-template <class T, class ReturnObject, bool is_noexcept>
+template <class T, class ReturnObject, bool is_noexcept = true>
 struct promise {
     static T& mutable_T();
     static T const& const_T();
