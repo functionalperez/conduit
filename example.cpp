@@ -1,27 +1,26 @@
-#include <iostream>
 #include "include/generator_promise.hpp"
 #include "include/unique_handle.hpp"
-#include "include/iterator.hpp"
+#include <iostream>
 
-template<class T>
+template <class T>
 using promise_handle = unique_handle<generator_promise<T, unique_handle>>;
 
 promise_handle<int> counter(int initial, int max, int inc) {
-    for(; initial < max; initial += inc) {
+    for (; initial < max; initial += inc) {
         co_yield initial;
     }
 }
 
 void example1() {
     auto countBy3 = counter(0, 30, 3);
-    for(; !countBy3.done(); countBy3.resume()) {
+    for (; !countBy3.done(); countBy3.resume()) {
         std::cout << countBy3->current_value << ' ';
     }
     std::cout << '\n';
 }
 void example2() {
     auto countBy3 = counter(0, 30, 3);
-    for(int i : countBy3) {
+    for (int i : countBy3) {
         std::cout << i << ' ';
     }
     std::cout << '\n';

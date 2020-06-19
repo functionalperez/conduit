@@ -1,7 +1,7 @@
 #pragma once
 #include <common.hpp>
-#include <utility>
 #include <optional>
+#include <utility>
 
 struct generator_sentinal {};
 
@@ -50,9 +50,7 @@ struct generator : private std::coroutine_handle<
             coro.resume();
             return *this;
         }
-        void operator++(int) noexcept(is_noexcept) {
-            coro.resume();
-        }
+        void operator++(int) noexcept(is_noexcept) { coro.resume(); }
         T operator*() noexcept(copy_T_noexcept) {
             return coro.promise().current_value;
         }
@@ -85,27 +83,28 @@ struct generator : private std::coroutine_handle<
     void destroy() {
         if (*this) {
             handle::destroy();
-            handle::operator=(nullptr);  
+            handle::operator=(nullptr);
         }
     }
     ~generator() noexcept(is_noexcept) {
         if (*this)
             handle::destroy();
     }
-    iterator begin() noexcept(is_noexcept) { 
+    iterator begin() noexcept(is_noexcept) {
         resume();
-        return {get_handle()}; 
+        return {get_handle()};
     }
     std::optional<T> next() {
         resume();
-        if(done()) {
+        if (done()) {
             return {};
         }
         return {handle::promise().current_value};
     }
     bool operator>>(T& dest) {
         resume();
-        if(done()) return false;
+        if (done())
+            return false;
         dest = handle::promise().current_value;
         return true;
     }

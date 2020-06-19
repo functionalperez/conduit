@@ -1,11 +1,21 @@
 #pragma once
 #include <common.hpp>
 
-template <class T, template<class> class ReturnObject_t, bool IsNoexcept = true, bool SuspendInitially = false>
+template <
+    // Type output by generator
+    class T,
+    // Template to make return object
+    template <class> class ReturnObject_t,
+    // Should funcitons be noexcept
+    bool IsNoexcept = true,
+    // Should the coroutine always suspend initially
+    bool SuspendInitially = false>
 struct generator_promise {
    private:
+    // These are just used to get a reference to T in template expressions
     static T& mutable_T();
     static T const& const_T();
+
    public:
     constexpr static bool is_noexcept = IsNoexcept;
     // true if initial_suspend() returns suspend_always
@@ -24,9 +34,9 @@ struct generator_promise {
     auto get_return_object() noexcept {
         return return_object{handle::from_promise(*this)};
     }
-    constexpr auto initial_suspend() noexcept { 
-        if constexpr(SuspendInitially) {
-            return std::suspend_always(); 
+    constexpr auto initial_suspend() noexcept {
+        if constexpr (SuspendInitially) {
+            return std::suspend_always();
         } else {
             return std::suspend_never();
         }

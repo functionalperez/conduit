@@ -1,7 +1,7 @@
 #pragma once
 #include <common.hpp>
 
-template<class T>
+template <class T>
 struct awaitable_reference {
     T& value;
     bool await_ready() { return false; }
