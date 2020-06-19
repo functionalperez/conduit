@@ -48,6 +48,7 @@ struct unique_handle : private std::coroutine_handle<Promise> {
         return *this;
     }
     // Releases ownership of the coroutine handle and returns the handle
+    // This is reset to null but the coroutine is NOT destroyed
     std::coroutine_handle<Promise> release() noexcept {
         base_type h = get();
         base_type::operator=(nullptr);
@@ -74,7 +75,7 @@ struct unique_handle : private std::coroutine_handle<Promise> {
         other.base_type::operator=(tmp);
     }
     // Obtains a copy of the coroutine handle
-    std::coroutine_handle<Promise> get() noexcept { return *static_cast<base_type>(this); }
+    std::coroutine_handle<Promise> get() noexcept { return *static_cast<base_type*>(this); }
     // Destroys the coroutine and resets the handle to null
     void destroy() { reset(); }
     ~unique_handle() {
