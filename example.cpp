@@ -3,9 +3,9 @@
 #include <iostream>
 
 template <class T>
-using promise_handle = unique_handle<generator_promise<T, unique_handle>>;
+using generator_handle = unique_handle<generator_promise<T, unique_handle>>;
 
-promise_handle<int> counter(int initial, int max, int inc) {
+generator_handle<int> counter(int initial, int max, int inc) {
     for (; initial < max; initial += inc) {
         co_yield initial;
     }
