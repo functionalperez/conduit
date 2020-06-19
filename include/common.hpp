@@ -3,6 +3,7 @@
 #include <exception>
 #include <cstddef>
 #include <utility>
+#include <type_traits>
 
 namespace std::experimental {
 using std::coroutine_handle;
