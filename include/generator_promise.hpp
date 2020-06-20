@@ -1,6 +1,10 @@
 #pragma once
 #include <common.hpp>
 
+enum generator_mode : bool {
+    check_first = false,
+    resume_first = true
+};
 template <
     // Type output by generator
     class T,
@@ -9,7 +13,7 @@ template <
     // Should funcitons be noexcept
     bool IsNoexcept = true,
     // Should the coroutine always suspend initially
-    bool SuspendInitially = false>
+    bool SuspendInitially = check_first>
 struct generator_promise {
    private:
     // These are just used to get a reference to T in template expressions
@@ -35,7 +39,7 @@ struct generator_promise {
         return return_object{handle::from_promise(*this)};
     }
     constexpr auto initial_suspend() noexcept {
-        if constexpr (SuspendInitially) {
+        if constexpr (suspend_initially) {
             return std::suspend_always();
         } else {
             return std::suspend_never();
