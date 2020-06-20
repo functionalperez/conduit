@@ -47,10 +47,20 @@ void example5() {
     }
     std::cout << '\n';
 }
+void example6() {
+    auto countBy3 = counter(0, 30, 3);
+    auto it = begin(countBy3);
+    auto sentinal = end(countBy3);
+    for(; it != sentinal; ++it) {
+        std::cout << *it << ' ';
+    }
+    std::cout << '\n';
+}
 int main() {
     example1();
     example2();
     example3();
     example4();
     example5();
+    example6();
 }
