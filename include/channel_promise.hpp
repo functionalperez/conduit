@@ -2,6 +2,9 @@
 #include "generator.hpp"
 #include <awaitable_reference.hpp>
 
+struct get_message_t{};
+constexpr get_message_t get_message = {};
+
 template <
     // Type output by generator
     class T,
@@ -15,11 +18,12 @@ template <
 struct channel_promise {
     using handle = std::coroutine_handle<channel_promise>;
     using return_object = ReturnObject_t<channel_promise>;
+    using message_type = Message;
 
     // yielded value stored here
-    T value;
+    T value = {};
     // message stored here
-    Message message;
+    Message message = {};
 
     static auto get_return_object_on_allocation_failure() noexcept {
         return return_object{nullptr};
@@ -40,6 +44,9 @@ struct channel_promise {
     constexpr auto yield_value(T value) noexcept(assign_T_noexcept) {
         this->value = std::move(value);
         return awaitable_reference { message };
+    }
+    constexpr auto yield_value(get_message_t) {
+        return awaitable_reference { message }; 
     }
 
     constexpr static bool is_noexcept = IsNoexcept;
