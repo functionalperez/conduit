@@ -1,84 +1,23 @@
-#include "include/generator_promise.hpp"
-#include "include/unique_handle.hpp"
-#include <channel.hpp>
-#include <generator.hpp>
+#include <minimal_promise.hpp>
 #include <iostream>
+#include <string_view>
 
-template <bool is_suspended_initially = check_first>
-generator<int, true, is_suspended_initially> counter(int initial, int max,
-                                                     int inc) {
-    for (; initial < max; initial += inc) {
-        co_yield initial;
-    }
-}
-
-void example1() {
-    auto countBy3 = counter<check_first>(0, 30, 3);
-    for (; !countBy3.done(); countBy3.resume()) {
-        std::cout << countBy3->value << ' ';
-    }
-    std::cout << '\n';
-}
-void example2() {
-    auto countBy3 = counter<resume_first>(0, 30, 3);
-    for (countBy3.resume(); !countBy3.done(); countBy3.resume()) {
-        std::cout << countBy3->value << ' ';
-    }
-    std::cout << '\n';
-}
-void example3() {
-    auto countBy3 = counter<check_first>(0, 30, 3);
-    int value = 0;
-    while (countBy3 >> value) {
-        std::cout << value << ' ';
-    }
-    std::cout << '\n';
-}
-void example4() {
-    auto countBy3 = counter<resume_first>(0, 30, 3);
-    int value = 0;
-    while (countBy3 >> value) {
-        std::cout << value << ' ';
-    }
-    std::cout << '\n';
-}
-void example5() {
-    auto countBy3 = counter(0, 30, 3);
-    for (int i : countBy3) {
-        std::cout << i << ' ';
-    }
-    std::cout << '\n';
-}
-void example6() {
-    auto countBy3 = counter(0, 30, 3);
-    auto it = begin(countBy3);
-    auto sentinal = end(countBy3);
-    for (; it != sentinal; ++it) {
-        std::cout << *it << ' ';
-    }
-    std::cout << '\n';
+void print_ordered(std::string_view s) {
+    static int event = 1;
+    std::cout << event << ")\t" << s << '\n';
+    event += 1;
 }
 
-channel<int> sum_messages() {
-    int sum = co_yield get_message;
-    while(true) {
-        sum += co_yield sum;
-    }
-}
-void example_channel() {
-    auto ch = sum_messages();
-    for(int i = 0; i <= 10; i++) {
-        int result;
-        ch << i >> result;
-        std::cout << "Sum so far: " << result << '\n';
-    }
+minimal_coro foo() {
+    print_ordered("Started coroutine");
+    co_await std::suspend_always();
+    print_ordered("Resumed coroutine");
 }
 int main() {
-    example1();
-    example2();
-    example3();
-    example4();
-    example5();
-    example6();
-    example_channel();
+    auto coro = foo();
+    print_ordered("Created coroutine");
+    coro.resume();
+    print_ordered("Coroutine suspends after reaching co_await");
+    coro.resume();
+    print_ordered("Coroutine complete");
 }
