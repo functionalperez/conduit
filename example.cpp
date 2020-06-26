@@ -21,3 +21,10 @@ int main() {
     coro.resume();
     print_ordered("Coroutine complete");
 }
+/* Outputs:
+1)	Created coroutine
+2)	Started coroutine
+3)	Coroutine suspends after reaching co_await
+4)	Resumed coroutine
+5)	Coroutine complete
+*/
