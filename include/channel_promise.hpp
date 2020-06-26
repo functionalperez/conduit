@@ -2,9 +2,6 @@
 #include <awaitable_reference.hpp>
 #include <generator_promise.hpp>
 
-struct get_message_t {};
-constexpr get_message_t get_message = {};
-
 template <
     // Type output by generator
     class T, class Message,
