@@ -4,6 +4,7 @@
 #include <exception>
 #include <type_traits>
 #include <utility>
+#include <tag_types.hpp>
 
 namespace std::experimental {
 using std::coroutine_handle;

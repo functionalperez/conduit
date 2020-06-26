@@ -1,4 +1,5 @@
 #pragma once
+#include <await_promise_object.hpp>
 #include <common.hpp>
 #include <unique_handle.hpp>
 
@@ -16,6 +17,8 @@ struct promise_base_base {
     constexpr void return_void() noexcept {}
 };
 
+// Implements a base type that encapsulates boilerplate code
+// used to implement coroutine promise objects
 template <
     // This is the class that derives from promise_base.
     class Derived,
@@ -31,6 +34,13 @@ struct promise_base : promise_base_base<SuspendInitially> {
     // If there's an allocation failure, returns a null coroutine handle
     static auto get_return_object_on_allocation_failure() noexcept {
         return return_object{nullptr};
+    }
+
+    // Allows you access to the promise object from within a coroutine via
+    // auto& promise = co_yield get_promise;
+    // await_ready() always returns true
+    awaitable_promise_object<Derived> yield_value(get_promise_t) {
+        return awaitable_promise_object<Derived>{get_promise()};
     }
 
     // Used by the compiler to produce the return_object when starting the coroutine
