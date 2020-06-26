@@ -1,7 +1,6 @@
 #pragma once
 #include <promise_base.hpp>
 
-enum generator_mode : bool { check_first = false, resume_first = true };
 template <
     // Type output by generator
     class T,
@@ -14,11 +13,12 @@ template <
 struct generator_promise
     : promise_base<generator_promise<T, ReturnObject, IsNoexcept, SuspendInitially>, ReturnObject,
                    SuspendInitially> {
+
     // yielded value stored here
     T value;
 
     // Stores value in this->value, to be accessed by the caller via
-    // coroutine_handle.promise()
+    // coroutine_handle.promise().value
     constexpr auto yield_value(T value) noexcept(move_T_noexcept) {
         this->value = std::move(value);
         return std::suspend_always{};
@@ -26,9 +26,6 @@ struct generator_promise
 
     // true if template noexcept flag is marked true
     constexpr static bool is_noexcept = IsNoexcept;
-
-    // true if initial_suspend() returns suspend_always
-    constexpr static bool suspend_initially = SuspendInitially;
 
    private:
     // These are just used to get a reference to T in template expressions

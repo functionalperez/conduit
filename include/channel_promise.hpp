@@ -28,9 +28,8 @@ struct channel_promise
     }
     constexpr auto yield_value(get_message_t) { return awaitable_reference{message}; }
 
+    // true if template noexcept flag is marked true
     constexpr static bool is_noexcept = IsNoexcept;
-    // true if initial_suspend() returns suspend_always
-    constexpr static bool suspend_initially = SuspendInitially;
 
    private:
     // These are just used to get a reference to T in template expressions
