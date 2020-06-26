@@ -1,3 +1,4 @@
+#pragma once
 // This provides boilerplate to make a minimal tag_type
 // With the ability to prevent ambiguity in overload resolution
 template<class tag>
