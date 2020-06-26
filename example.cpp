@@ -1,6 +1,7 @@
 #include <iostream>
 #include <minimal_promise.hpp>
 #include <string_view>
+#include "channel_examples.cpp"
 
 void print_ordered(std::string_view s) {
     static int event = 1;
@@ -14,6 +15,7 @@ minimal_coro foo() {
     print_ordered("Resumed coroutine");
 }
 int main() {
+    run();
     auto coro = foo();
     print_ordered("Created coroutine");
     coro.resume();

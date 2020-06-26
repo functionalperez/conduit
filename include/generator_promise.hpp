@@ -18,8 +18,11 @@ struct generator_promise
 
     // If SuspendsInitially is false, we hide the default behavior in
     // promise_base
-    constexpr auto initial_suspend() noexcept requires(!SuspendInitially) {
-        return std::suspend_never();
+    constexpr auto initial_suspend() noexcept {
+        if constexpr (SuspendInitially)
+            return std::suspend_always{};
+        else
+            return std::suspend_never{};
     }
 
     // Stores value in this->value, to be accessed by the caller via
