@@ -1,11 +1,11 @@
 #pragma once
-#include <common.hpp>
 #include <awaitable_reference.hpp>
+#include <common.hpp>
 
 namespace mini {
 
 struct get_send_t {};
-constexpr get_send_t get_send; 
+constexpr get_send_t get_send;
 template <class Out, class In = Out>
 struct channel {
     struct promise_type;
@@ -13,13 +13,13 @@ struct channel {
 
     struct promise_type {
         Out current_value;
-        In response; 
+        In response;
         awaitable_reference<In> yield_value(get_send_t) {
-            return awaitable_reference(response); 
+            return awaitable_reference(response);
         }
         awaitable_reference<In> yield_value(Out value) {
             current_value = value;
-            return awaitable_reference(response); 
+            return awaitable_reference(response);
         }
 
         channel get_return_object() {
@@ -36,14 +36,13 @@ struct channel {
         void return_void() {}
     };
 
-    Out receive() { 
-        return handle.promise().current_value; 
-    }
+    Out receive() { return handle.promise().current_value; }
 
     void send(In response) {
-        handle.promise().response = std::move(response); 
-        handle.resume(); 
+        handle.promise().response = std::move(response);
+        handle.resume();
     }
+
    private:
     channel(handle_type handle) : handle(handle) {}
     handle_type handle = nullptr;

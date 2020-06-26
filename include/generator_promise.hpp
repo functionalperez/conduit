@@ -17,7 +17,7 @@ struct generator_promise {
 
     // yielded value stored here
     T value;
-    
+
     static auto get_return_object_on_allocation_failure() noexcept {
         return return_object{nullptr};
     }

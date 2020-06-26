@@ -21,13 +21,11 @@ struct generator {
     std::coroutine_handle<promise_type> handle = nullptr;
 
     void destroy() {
-        if(handle) {
+        if (handle) {
             handle.destroy();
-            handle = nullptr; 
+            handle = nullptr;
         }
     }
-    ~generator() {
-        destroy(); 
-    }
+    ~generator() { destroy(); }
 };
-}
+} // namespace mini

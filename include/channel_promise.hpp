@@ -2,13 +2,12 @@
 #include "generator.hpp"
 #include <awaitable_reference.hpp>
 
-struct get_message_t{};
+struct get_message_t {};
 constexpr get_message_t get_message = {};
 
 template <
     // Type output by generator
-    class T,
-    class Message,
+    class T, class Message,
     // Template to make return object
     template <class> class ReturnObject_t,
     // Should funcitons be noexcept
@@ -43,10 +42,10 @@ struct channel_promise {
     constexpr void return_void() noexcept {}
     constexpr auto yield_value(T value) noexcept(assign_T_noexcept) {
         this->value = std::move(value);
-        return awaitable_reference { message };
+        return awaitable_reference{message};
     }
     constexpr auto yield_value(get_message_t) {
-        return awaitable_reference { message }; 
+        return awaitable_reference{message};
     }
 
     constexpr static bool is_noexcept = IsNoexcept;

@@ -60,13 +60,13 @@ void example6() {
 
 channel<int> sum_messages() {
     int sum = co_yield get_message;
-    while(true) {
+    while (true) {
         sum += co_yield sum;
     }
 }
 void example_channel() {
     auto ch = sum_messages();
-    for(int i = 0; i <= 10; i++) {
+    for (int i = 0; i <= 10; i++) {
         int result;
         ch << i >> result;
         std::cout << "Sum so far: " << result << '\n';

@@ -1,5 +1,5 @@
-#include <minimal_promise.hpp>
 #include <iostream>
+#include <minimal_promise.hpp>
 #include <string_view>
 
 void print_ordered(std::string_view s) {

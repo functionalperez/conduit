@@ -8,5 +8,5 @@ struct awaitable_reference {
     void await_suspend(std::coroutine_handle<>) {}
     T await_resume() { return value; }
 };
-template<class T>
+template <class T>
 awaitable_reference(T&) -> awaitable_reference<T>;
