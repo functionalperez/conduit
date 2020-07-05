@@ -38,7 +38,7 @@ struct unique_handle : private std::coroutine_handle<Promise> {
     // Creates a unique_handle from the promise_type object in the
     // coroutine_frame
     static unique_handle from_promise(promise_type& p) {
-        return unique_handle(handle::from_promise(p));
+        return unique_handle(p);
     }
     // Creates a unique_handle from a void* representing a coroutine_handle
     static unique_handle from_address(void* addr) {
@@ -48,10 +48,10 @@ struct unique_handle : private std::coroutine_handle<Promise> {
     // constructs a unique_handle from a coroutine handle
     explicit unique_handle(std::coroutine_handle<Promise> h) : base_type(h) {
         if constexpr(is_return_object_aware) {
-            h.promise().set_return_object(this);
+            promise().set_return_object(this);
         }
     }
-    explicit unique_handle(Promise& h) : base_type(base_type::from_promise(h)) {
+    explicit unique_handle(promise_type& h) : base_type(base_type::from_promise(h)) {
         if constexpr(is_return_object_aware) {
             h.set_return_object(this);
         }
@@ -59,6 +59,9 @@ struct unique_handle : private std::coroutine_handle<Promise> {
     unique_handle(unique_handle const&) = delete;
     unique_handle(unique_handle&& source) : base_type(source) {
         source.base_type::operator=(nullptr);
+        if constexpr(is_return_object_aware) {
+            promise().set_return_object(nullptr);
+        }
     }
 
     // destroys the coroutine and resets the coroutine_handle to null
@@ -78,6 +81,9 @@ struct unique_handle : private std::coroutine_handle<Promise> {
     std::coroutine_handle<Promise> release() noexcept {
         base_type h = get();
         base_type::operator=(nullptr);
+        if constexpr(is_return_object_aware) {
+            h.promise().set_return_object(nullptr);
+        }
         return h;
     }
     // destroys the coroutine and resets the coroutine_handle to null
@@ -85,6 +91,18 @@ struct unique_handle : private std::coroutine_handle<Promise> {
         if (*this) {
             base_type::destroy();
             base_type::operator=(nullptr);
+        }
+    }
+    // Assigns another unique_handle without invoking destroy
+    // on the current coroutine handle
+    constexpr void assign_no_destroy(unique_handle other) noexcept {
+        if constexpr(is_return_object_aware) {
+            promise().set_return_object(nullptr);
+        }
+        base_type::operator=(other.get());
+        other.base_type::operator=(nullptr);
+        if constexpr(is_return_object_aware) {
+            promise().set_return_object(this);
         }
     }
     // destroys the coroutine and replaces the coroutine handle with p
@@ -99,10 +117,15 @@ struct unique_handle : private std::coroutine_handle<Promise> {
         base_type tmp = *this;
         base_type::operator=(other);
         other.base_type::operator=(tmp);
+        if constexpr(is_return_object_aware) {
+            (*this)->set_return_object(this);
+            other->set_return_object(&other);
+        }
     }
     // Obtains a copy of the coroutine handle
-    std::coroutine_handle<Promise> get() noexcept {
-        return *static_cast<base_type*>(this);
+    constexpr std::coroutine_handle<Promise> get() noexcept {
+        base_type tmp = *this;
+        return tmp;
     }
     // Destroys the coroutine and resets the handle to null
     void destroy() { reset(); }
