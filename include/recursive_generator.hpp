@@ -23,20 +23,17 @@ struct recursive_generator_promise
     return_object* sauce = nullptr;
 
    public:
-    void set_return_object(return_object* sauce) {
-        this->sauce = sauce;
-        std::cout << "Obtained return object of " << (void*)sauce << '\n';
-    }
+    void set_return_object(return_object* sauce) { this->sauce = sauce; }
 
     void return_value(return_object new_generator) {
-        *sauce = std::move(new_generator);
+        sauce->assign_no_destroy(std::move(new_generator));
     }
 
-    // suspend_maybe final_suspend() noexcept {
-    //     // We suspend if the sauce isn't null
-    //     // To allow the sauce to clean it up
-    //     return suspend_maybe{sauce != nullptr};
-    // }
+    suspend_maybe final_suspend() noexcept {
+        // If the sauce is null, this coroutine has been detached
+        // so await_ready should indicate true in order to clean up coroutine
+        return suspend_maybe{sauce == nullptr};
+    }
     // yielded value stored here
     T value;
 
