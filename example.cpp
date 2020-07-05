@@ -2,6 +2,7 @@
 #include <minimal_promise.hpp>
 #include <string_view>
 #include "channel_examples.cpp"
+#include <recursive_generator.hpp>
 
 void print_ordered(auto... args) {
     static int event = 1;
@@ -24,7 +25,20 @@ minimal_coro foo() {
     co_await std::suspend_always();
     print_ordered("Resumed coroutine");
 }
+
+recursive_generator<int> foo2() {
+    co_yield 1;
+    co_yield 2;
+    co_yield 3;
+    co_return foo2();
+}
 int main() {
+    auto r = foo2();
+    std::cout << "Should have return object at " << (void*)&r << '\n';
+    for(int i = 0; i < 10; i++) {
+        std::cout << r->value;
+        r.resume();
+    }
     run();
     auto coro = foo();
     print_ordered("Created coroutine with promise at ", (void*)(&coro.promise()));

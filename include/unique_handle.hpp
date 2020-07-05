@@ -9,6 +9,7 @@ struct unique_handle : private std::coroutine_handle<Promise> {
     static Promise& declPromise();
 
    public:
+    constexpr static bool is_return_object_aware = return_object_aware<Promise, unique_handle>;
     // Checks if the promise is noexcept
     constexpr static bool is_noexcept = Promise::is_noexcept;
     // This is used by the compiler to generate the coroutine frame
@@ -45,8 +46,16 @@ struct unique_handle : private std::coroutine_handle<Promise> {
     }
 
     // constructs a unique_handle from a coroutine handle
-    explicit unique_handle(std::coroutine_handle<Promise> h) : base_type(h) {}
-    explicit unique_handle(Promise& h) : base_type(base_type::from_promise(h)) {}
+    explicit unique_handle(std::coroutine_handle<Promise> h) : base_type(h) {
+        if constexpr(is_return_object_aware) {
+            h.promise().set_return_object(this);
+        }
+    }
+    explicit unique_handle(Promise& h) : base_type(base_type::from_promise(h)) {
+        if constexpr(is_return_object_aware) {
+            h.set_return_object(this);
+        }
+    }
     unique_handle(unique_handle const&) = delete;
     unique_handle(unique_handle&& source) : base_type(source) {
         source.base_type::operator=(nullptr);
