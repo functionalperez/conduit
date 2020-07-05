@@ -46,6 +46,7 @@ struct unique_handle : private std::coroutine_handle<Promise> {
 
     // constructs a unique_handle from a coroutine handle
     explicit unique_handle(std::coroutine_handle<Promise> h) : base_type(h) {}
+    explicit unique_handle(Promise& h) : base_type(base_type::from_promise(h)) {}
     unique_handle(unique_handle const&) = delete;
     unique_handle(unique_handle&& source) : base_type(source) {
         source.base_type::operator=(nullptr);
