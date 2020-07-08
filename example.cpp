@@ -26,19 +26,26 @@ minimal_coro foo() {
     print_ordered("Resumed coroutine");
 }
 
-recursive_generator<int> recursive_fib(int f1 = 1, int f2 = 1) {
+recursive_generator<long> recursive_fib(int num, long f1 = 1, long f2 = 1) {
+    if(num == 0) {
+        co_return nothing;
+    }
     co_yield f1;
-    co_return recursive_fib(f2, f1 + f2);
+    co_return recursive_fib(num - 1, f2, f1 + f2);
 }
-recursive_generator<int> r2() {
-    co_yield 1;
-    co_yield 2; 
-    co_return;
+auto fib(int num, long f1 = 1, long f2 = 1) -> recursive_generator<long> {
+    co_yield f1;
+    co_return num == 1
+        ? nothing
+        : (fib(num - 1, f2, f1 + f2));
+}
+auto f(long f1 = 1, long f2 = 1) -> recursive_generator<long> {
+    co_yield f1;
+    co_return f(f2, f1 + f2);
 }
 int main() {
-    auto r = recursive_fib();
-    std::cout << "Should have return object at " << (void*)&r << '\n';
-    for(int i = 0; i < 100; i++) {
+    auto r = fib(10);
+    while(!r.done()) {
         std::cout << r->value << '\n';
         r.resume();
     }
