@@ -14,6 +14,7 @@ class coroutine : private std::unique_ptr<void, coroutine_deleter<coroutine_prom
 
    public:
     using base_type::get;
+    using base_type::reset;
     using promise_type = coroutine_promise;
     using handle = std::coroutine_handle<promise_type>;
     coroutine() = default;
@@ -28,6 +29,10 @@ class coroutine : private std::unique_ptr<void, coroutine_deleter<coroutine_prom
         base_type::swap(other);
         return *this;
     }
+    coroutine& operator=(std::nullptr_t) {
+        reset();
+        return *this;
+    }
 
     auto operator->() noexcept { return &get().promise(); }
     auto& operator*() noexcept { return get().promise(); }
@@ -37,6 +42,7 @@ class coroutine : private std::unique_ptr<void, coroutine_deleter<coroutine_prom
     auto& promise() const noexcept { return get().promise(); }
     bool done() const noexcept { return get().done(); }
     void resume() noexcept { get().resume(); }
+    void destroy() { reset(); }
 };
 
 class coroutine_promise {
@@ -46,8 +52,6 @@ class coroutine_promise {
     void return_void() noexcept {}
     [[noreturn]] void unhandled_exception() noexcept { std::terminate(); }
 
-    static coroutine get_return_object_on_allocation_failure() {
-        return {};
-    }
+    static coroutine get_return_object_on_allocation_failure() { return {}; }
     coroutine get_return_object() { return coroutine(*this); }
 };
