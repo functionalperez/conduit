@@ -11,9 +11,27 @@ template <
     bool IsNoexcept = true,
     // Should the coroutine always suspend initially
     bool SuspendInitially = check_first>
+struct recursive_generator_promise;
+
+struct nothing_t {
+    explicit nothing_t() = default;
+
+    template <class T>
+    operator unique_handle<recursive_generator_promise<T>>() const;
+};
+
+constexpr auto nothing = nothing_t();
+
+template <
+    // Type output by generator
+    class T,
+    // Should funcitons be noexcept
+    bool IsNoexcept,
+    // Should the coroutine always suspend initially
+    bool SuspendInitially>
 struct recursive_generator_promise
     : promise_base<recursive_generator_promise<T, IsNoexcept, SuspendInitially>, unique_handle,
-                   SuspendInitially> {
+                   SuspendInitially, false> {
 
     using base_type = promise_base<recursive_generator_promise<T, IsNoexcept, SuspendInitially>,
                                    unique_handle, SuspendInitially>;
@@ -28,6 +46,7 @@ struct recursive_generator_promise
     void return_value(return_object new_generator) {
         sauce->assign_no_destroy(std::move(new_generator));
     }
+    void return_value(nothing_t) {}
 
     suspend_maybe final_suspend() noexcept {
         // If the sauce is null, this coroutine has been detached
@@ -56,3 +75,8 @@ struct recursive_generator_promise
 
 template <class T>
 using recursive_generator = unique_handle<recursive_generator_promise<T>>;
+
+template <class T>
+nothing_t::operator recursive_generator<T>() const {
+    co_return nothing;
+}
