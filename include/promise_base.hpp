@@ -4,7 +4,7 @@
 #include <unique_handle.hpp>
 
 // This is an incomplete promise_base
-template <bool SuspendInitially>
+template <bool SuspendInitially, bool HasReturnVoid = true>
 struct promise_base_base {
     constexpr auto initial_suspend() noexcept {
         if constexpr (SuspendInitially)
@@ -16,6 +16,18 @@ struct promise_base_base {
     [[noreturn]] void unhandled_exception() noexcept { std::terminate(); }
     constexpr void return_void() noexcept {}
 };
+// This is an incomplete promise_base
+template <bool SuspendInitially>
+struct promise_base_base<SuspendInitially, false> {
+    constexpr auto initial_suspend() noexcept {
+        if constexpr (SuspendInitially)
+            return std::suspend_always{};
+        else
+            return std::suspend_never{};
+    }
+    constexpr auto final_suspend() noexcept { return std::suspend_always(); }
+    [[noreturn]] void unhandled_exception() noexcept { std::terminate(); }
+};
 
 // Implements a base type that encapsulates boilerplate code
 // used to implement coroutine promise objects
@@ -26,8 +38,10 @@ template <
     template <class> class ReturnObject = unique_handle,
     // And this determines whether or not initial_suspend returns
     // suspend_always or suspend_never
-    bool SuspendInitially = true>
-struct promise_base : promise_base_base<SuspendInitially> {
+    bool SuspendInitially = true,
+    // This determines whether or not promise_base has return_void
+    bool HasReturnVoid = true>
+struct promise_base : promise_base_base<SuspendInitially, HasReturnVoid> {
     using handle = std::coroutine_handle<Derived>;
     using return_object = ReturnObject<Derived>;
 
