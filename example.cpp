@@ -3,6 +3,7 @@
 #include <string_view>
 #include "channel_examples.cpp"
 #include <recursive_generator.hpp>
+#include <task.hpp>
 
 void print_ordered(auto... args) {
     static int event = 1;
@@ -43,7 +44,22 @@ auto f(long f1 = 1, long f2 = 1) -> recursive_generator<long> {
     co_yield f1;
     co_return f(f2, f1 + f2);
 }
+auto nums(int initial = 0) -> recursive_generator<long> {
+    co_yield initial;
+    co_return nums(initial + 1);
+}
+
+task<int> t1() {
+    std::cout << "Doing t1\n";
+    co_return 4; 
+}
+task<int> t2() {
+    std::cout << "Recieved " << co_await t1() << '\n';
+    co_return 5;
+}
 int main() {
+    auto t2_ = t2();
+    t2_.resume();
     auto r = fib(10);
     while(!r.done()) {
         std::cout << r->value << '\n';
