@@ -49,11 +49,11 @@ auto nums(int initial = 0) -> recursive_generator<long> {
     co_return nums(initial + 1);
 }
 
-task<int> t1() {
+future<int> t1() {
     std::cout << "Doing t1\n";
     co_return 4; 
 }
-task<int> t2() {
+future<int> t2() {
     std::cout << "Recieved " << co_await t1() << '\n';
     co_return 5;
 }
