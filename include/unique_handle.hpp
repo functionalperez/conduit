@@ -127,6 +127,9 @@ struct unique_handle : private std::coroutine_handle<Promise> {
         base_type tmp = *this;
         return tmp;
     }
+    constexpr std::coroutine_handle<> get_raw_handle() noexcept {
+        return *this;
+    }
     // Destroys the coroutine and resets the handle to null
     void destroy() { reset(); }
     ~unique_handle() {
