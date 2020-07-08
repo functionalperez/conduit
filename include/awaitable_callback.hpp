@@ -2,11 +2,11 @@
 #include <common.hpp>
 
 struct awaitable_callback {
-    std::coroutine_handle<> callback = nullptr;
+    std::coroutine_handle<> callback = std::noop_coroutine();
     constexpr bool await_ready() noexcept {
         return false;
     }
-    std::coroutine_handle<> await_suspend() noexcept {
+    std::coroutine_handle<> await_suspend(std::coroutine_handle<>) noexcept {
         return callback;
     }
     void await_resume() noexcept {}
