@@ -1,18 +1,17 @@
-cmake_minimum_required(VERSION 3.10)
-
-# set the project name
-project(conduit)
-
-set(CMAKE_C_COMPILER "gcc-10")
-set(CMAKE_CXX_COMPILER "g++-10")
+cmake_minimum_required(VERSION 3.0.0)
+project(conduit VERSION 0.1.0)
 
 set(CMAKE_CXX_STANDARD 20)
-set(CMAKE_CXX_STANDARD_REQUIRED True)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+include(CTest)
+enable_testing()
 
 add_compile_options("-fcoroutines")
 include_directories(include)
 
-# add the executable
-add_executable(run_example example.cpp)
+add_executable(conduit main.cpp)
+
+set(CPACK_PROJECT_NAME ${PROJECT_NAME})
+set(CPACK_PROJECT_VERSION ${PROJECT_VERSION})
+include(CPack)
