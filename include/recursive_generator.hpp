@@ -1,5 +1,4 @@
 #pragma once
-#include <iostream>
 #include <promise_base.hpp>
 #include <suspend_maybe.hpp>
 #include <unique_handle.hpp>
@@ -30,17 +29,33 @@ template <
     // Should the coroutine always suspend initially
     bool SuspendInitially>
 struct recursive_generator_promise
-    : promise_base<recursive_generator_promise<T, IsNoexcept, SuspendInitially>, unique_handle,
-                   SuspendInitially, false> {
+    : promise_base<recursive_generator_promise<T, IsNoexcept, SuspendInitially>, SuspendInitially,
+                   false> {
 
     using base_type = promise_base<recursive_generator_promise<T, IsNoexcept, SuspendInitially>,
-                                   unique_handle, SuspendInitially>;
-    using return_object = typename base_type::return_object;
+                                   SuspendInitially, false>;
+    using return_object = unique_handle<recursive_generator_promise>;
 
-   private:
+   public:
     return_object* sauce = nullptr;
 
    public:
+    using base_type::yield_value;
+
+    /* --- IMPORTANT --- */
+    /*
+        I believe that there is a bug in gcc where the compiler will construct
+        the return object *after* the call to initial_suspend if get_return_object
+        doesn't directly return the return object.
+
+        In other words, if get_return_object returns a handle,
+        then the compiler will construct unique_handle *after* the coroutine
+        finally suspends. This results in a segfault in some cases.
+
+        The workaround is to explicitly create a get_return_object that returns a unique_handle
+        in classes for which the ordering of initial_suspend and get_return_object is important.
+    */
+    auto get_return_object() { return return_object{base_type::get_handle()}; }
     void set_return_object(return_object* sauce) { this->sauce = sauce; }
 
     void return_value(return_object new_generator) {

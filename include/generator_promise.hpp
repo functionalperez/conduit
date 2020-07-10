@@ -4,15 +4,12 @@
 template <
     // Type output by generator
     class T,
-    // Template to make return object
-    template <class> class ReturnObject,
     // Should funcitons be noexcept
     bool IsNoexcept = true,
     // Should the coroutine always suspend initially
     bool SuspendInitially = check_first>
 struct generator_promise
-    : promise_base<generator_promise<T, ReturnObject, IsNoexcept, SuspendInitially>, ReturnObject,
-                   SuspendInitially> {
+    : promise_base<generator_promise<T, IsNoexcept, SuspendInitially>, SuspendInitially> {
 
     // yielded value stored here
     T value;

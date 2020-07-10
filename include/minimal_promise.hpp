@@ -4,4 +4,4 @@
 
 struct minimal_promise : promise_base<minimal_promise> {};
 
-using minimal_coro = typename minimal_promise::return_object;
+using minimal_coro = unique_handle<minimal_promise>;

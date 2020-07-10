@@ -46,12 +46,12 @@ struct unique_handle : private std::coroutine_handle<Promise> {
     }
 
     // constructs a unique_handle from a coroutine handle
-    explicit unique_handle(std::coroutine_handle<Promise> h) : base_type(h) {
+    unique_handle(std::coroutine_handle<Promise> h) : base_type(h) {
         if constexpr(is_return_object_aware) {
             promise().set_return_object(this);
         }
     }
-    explicit unique_handle(promise_type& h) : base_type(base_type::from_promise(h)) {
+    unique_handle(promise_type& h) : base_type(base_type::from_promise(h)) {
         if constexpr(is_return_object_aware) {
             h.set_return_object(this);
         }
@@ -151,7 +151,7 @@ auto begin(unique_handle<T>& p) {
     return coro_iterator{p.get()};
 }
 template <class T>
-auto end(unique_handle<T>& p) {
+auto end(unique_handle<T>&) {
     // coro_sentinal is just used to proivide an overload for
     // coro_iterator::operator== so it doesn't need to contain any information
     // about the coroutine handle

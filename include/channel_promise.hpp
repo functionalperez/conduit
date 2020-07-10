@@ -5,15 +5,12 @@
 template <
     // Type output by generator
     class T, class Message,
-    // Template to make return object
-    template <class> class ReturnObject,
     // Should funcitons be noexcept
     bool IsNoexcept = true,
     // Should the coroutine always suspend initially
     bool SuspendInitially = check_first>
 struct channel_promise
-    : promise_base<channel_promise<T, Message, ReturnObject, IsNoexcept, SuspendInitially>,
-                   ReturnObject, SuspendInitially> {
+    : promise_base<channel_promise<T, Message, IsNoexcept, SuspendInitially>, SuspendInitially> {
     using message_type = Message;
 
     // yielded value stored here
