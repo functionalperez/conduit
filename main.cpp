@@ -1,9 +1,12 @@
-#include <iostream>
 #include <minimal_promise.hpp>
-#include <string_view>
-#include "channel_examples.cpp"
 #include <recursive_generator.hpp>
+
 #include <task.hpp>
+
+#include "channel_examples.cpp"
+
+#include <iostream>
+#include <string_view>
 
 void print_ordered(auto... args) {
     static int event = 1;
@@ -28,7 +31,7 @@ minimal_coro foo() {
 }
 
 recursive_generator<long> recursive_fib(int num, long f1 = 1, long f2 = 1) {
-    if(num == 0) {
+    if (num == 0) {
         co_return nothing;
     }
     co_yield f1;
@@ -36,9 +39,7 @@ recursive_generator<long> recursive_fib(int num, long f1 = 1, long f2 = 1) {
 }
 auto fib(int num, long f1 = 1, long f2 = 1) -> recursive_generator<long> {
     co_yield f1;
-    co_return num == 1
-        ? nothing
-        : (fib(num - 1, f2, f1 + f2));
+    co_return num == 1 ? nothing : (fib(num - 1, f2, f1 + f2));
 }
 auto f(long f1 = 1, long f2 = 1) -> recursive_generator<long> {
     co_yield f1;
@@ -51,7 +52,7 @@ auto nums(int initial = 0) -> recursive_generator<long> {
 
 future<int> t1() {
     std::cout << "Doing t1\n";
-    co_return 4; 
+    co_return 4;
 }
 future<int> t2() {
     std::cout << "Recieved " << co_await t1() << '\n';
@@ -60,11 +61,13 @@ future<int> t2() {
 int main() {
     auto t2_ = t2();
     t2_.resume();
+
     auto r = fib(10);
-    while(!r.done()) {
+    while (!r.done()) {
         std::cout << r->value << '\n';
         r.resume();
     }
+
     run();
     auto coro = foo();
     print_ordered("Created coroutine with promise at ", (void*)(&coro.promise()));
@@ -72,7 +75,7 @@ int main() {
     print_ordered("Coroutine suspends after reaching co_await");
     coro.resume();
     print_ordered("Coroutine complete");
-    for(int i : bar()) {
+    for (int i : bar()) {
         std::cout << i << '\n';
     }
 }
