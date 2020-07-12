@@ -5,15 +5,15 @@
 template <class Promise>
 struct unique_channel : public unique_handle<Promise> {
     using message_type = typename Promise::message_type;
-    using base = unique_handle<Promise>;
-    using base::base;
+    using base_type = unique_handle<Promise>;
+    using base_type::base_type;
 
-    void send(message_type const& message) { base::promise().message = message; }
+    void send(message_type const& message) { base_type::promise().message = message; }
 };
 
 template <class T, class Message = T, bool is_noexcept = true, bool generator_mode = check_first>
 using channel =
-    unique_channel<promise::channel_promise<T, Message, is_noexcept, generator_mode>>;
+    unique_channel<promise::channel<T, Message, is_noexcept, generator_mode>>;
 
 template <class T, class Message, bool is_noexcept, bool which_first>
 auto& operator<<(channel<T, Message, is_noexcept, which_first>& ch,

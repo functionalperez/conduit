@@ -18,16 +18,16 @@ namespace promise {
 template <
     // Type output by generator
     class T>
-struct recursive_generator_promise;
+struct recursive_generator;
 
 template <
     // Type output by generator
     class T>
-struct recursive_generator_promise
-    : promise_base< recursive_generator_promise<T>, no_return_void> {
+struct recursive_generator
+    : helper< recursive_generator<T>, no_return_void> {
 
-    using base_type = promise_base<recursive_generator_promise, no_return_void>;
-    using return_object = unique_handle<recursive_generator_promise>;
+    using base_type = helper<recursive_generator, no_return_void>;
+    using return_object = unique_handle<recursive_generator>;
 
    public:
     return_object* sauce = nullptr;
@@ -79,4 +79,4 @@ struct recursive_generator_promise
 };
 }
 template <class T>
-using recursive_generator = unique_handle<promise::recursive_generator_promise<T>>;
+using recursive_generator = unique_handle<promise::recursive_generator<T>>;

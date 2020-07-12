@@ -5,7 +5,7 @@
 
 namespace promise {
 template <class ReturnValue>
-struct future_promise : promise_base<future_promise<ReturnValue>> {
+struct future : helper<future<ReturnValue>> {
     std::coroutine_handle<> callback = std::noop_coroutine();
     ReturnValue returned_value = {};
 
@@ -16,8 +16,8 @@ struct future_promise : promise_base<future_promise<ReturnValue>> {
 };
 }
 template <class T>
-struct future : unique_handle<promise::future_promise<T>> {
-    using base_type = unique_handle<promise::future_promise<T>>;
+struct future : unique_handle<promise::future<T>> {
+    using base_type = unique_handle<promise::future<T>>;
     using base_type::base_type;
 
     bool await_ready() noexcept { return base_type::done(); }

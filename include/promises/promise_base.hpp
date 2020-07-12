@@ -40,23 +40,23 @@ template <>
 struct return_void_base<false> {};
 
 template<bool initial_suspend = false, bool final_suspend = true, bool needs_return = true, bool noexcept_ = true>
-struct promise_traits {
+struct traits {
     constexpr static bool suspends_initially = initial_suspend;
     constexpr static bool suspends_finally = final_suspend;
     constexpr static bool needs_return_void = needs_return;
     constexpr static bool is_noexcept = noexcept_;
 };
-using no_return_void = promise_traits<false, true, false, true>;
+using no_return_void = traits<false, true, false, true>;
 
-constexpr promise_traits<> get_promise_traits(auto const& promise);
+constexpr traits<> get_traits(auto const& promise);
 
 // Implements a base type that encapsulates boilerplate code
 // used to implement coroutine promise objects
 template <
     // This is the class that derives from promise_base.
     class Promise, 
-    class traits = decltype(get_promise_traits(std::declval<Promise>()))>
-struct promise_base : initial_suspend_base<traits::suspends_initially>,
+    class traits = decltype(get_traits(std::declval<Promise>()))>
+struct helper : initial_suspend_base<traits::suspends_initially>,
                       final_suspend_base<traits::suspends_finally>,
                       return_void_base<traits::needs_return_void>,
                       unhandled_exception_base<traits::is_noexcept> {

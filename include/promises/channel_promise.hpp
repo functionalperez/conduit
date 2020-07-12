@@ -10,8 +10,8 @@ template <
     bool IsNoexcept = true,
     
     bool InitialSuspend = false>
-struct channel_promise
-    : promise_base<channel_promise<T, Message, IsNoexcept>, promise_traits<InitialSuspend, true, true, IsNoexcept>> {
+struct channel
+    : helper<channel<T, Message, IsNoexcept>, traits<InitialSuspend, true, true, IsNoexcept>> {
     using message_type = Message;
 
     // yielded value stored here
