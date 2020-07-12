@@ -1,90 +1,34 @@
 #include <conduit/co_void.hpp>
-#include <conduit/promise/recursive_generator.hpp>
-
-#include <conduit/async/future.hpp>
-
-#include "channel_examples.cpp"
-
+#include <conduit/detached.hpp>
 #include <iostream>
-#include <string_view>
 
-using namespace conduit;
-
-void print_ordered(auto... args) {
-    static int event = 1;
-    std::cout << event << ")\t";
-    (std::cout << ... << args);
-    std::cout << '\n';
-    event += 1;
-}
-
-generator<int> bar() {
-    co_yield 3;
-    co_yield {};
-    co_yield 5;
-}
+using conduit::co_void;
 
 co_void foo() {
-    print_ordered("Started coroutine");
-    auto* promise = co_yield get_promise;
-    print_ordered("Promise at ", (void*)promise);
-    co_await std::suspend_always();
-    print_ordered("Resumed coroutine");
+    std::cout << "Hello, world!\n";
+    co_await std::suspend_always{};
+    std::cout << "Goodbye, world\n";
+}
+conduit::detached evil_coro(std::coroutine_handle<conduit::promise::detached>& handle) {
+    handle = co_yield conduit::get_handle;
+
+    std::cout << "Hello, world!\n";
+
+    co_await std::suspend_always{};
+
+    std::cout << "Goodbye, world!\n";
 }
 
-recursive_generator<long> recursive_fib(int num, long f1 = 1, long f2 = 1) {
-    if (num == 0) {
-        co_return nothing;
-    }
-    co_yield f1;
-    co_return recursive_fib(num - 1, f2, f1 + f2);
-}
-auto fib(int num, long f1 = 1, long f2 = 1) -> recursive_generator<long> {
-    co_yield f1;
-    co_return num == 1 ? nothing : (fib(num - 1, f2, f1 + f2));
-}
-auto f(long f1 = 1, long f2 = 1) -> recursive_generator<long> {
-    co_yield f1;
-    co_return f(f2, f1 + f2);
-}
-auto nums(int initial = 0) -> recursive_generator<long> {
-    co_yield initial;
-    co_return nums(initial + 1);
-}
-
-async::future<int> t1() {
-    std::cout << "Doing t1\n";
-    co_return 4;
-}
-async::future<int> t2() {
-    std::cout << "Recieved " << co_await t1() << '\n';
-    co_return 5;
-}
 int main() {
-    auto t2_ = t2();
-    t2_.resume();
-
-    auto r = fib(10);
-    while (!r.done()) {
-        std::cout << r->value << '\n';
-        r.resume();
+    std::coroutine_handle<conduit::promise::detached> handle;
+    bool success = evil_coro(handle);
+    if(!success) {
+        std::cout << "Failed\n";
+        return 1;
     }
 
-    run();
-    auto coro = foo();
-    print_ordered("Created coroutine with promise at ", (void*)(&coro.promise()));
-    coro.resume();
-    print_ordered("Coroutine suspends after reaching co_await");
-    coro.resume();
-    print_ordered("Coroutine complete");
-    for (int i : bar()) {
-        std::cout << i << '\n';
-    }
+    std::cout << "[Paused]\n";
+
+    handle.resume();
+
 }
-/* Outputs:
-1)	Created coroutine
-2)	Started coroutine
-3)	Coroutine suspends after reaching co_await
-4)	Resumed coroutine
-5)	Coroutine complete
-*/
