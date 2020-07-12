@@ -56,10 +56,10 @@ struct recursive_generator
     }
     void return_value(nothing_t) {}
 
-    suspend_maybe final_suspend() noexcept {
+    async::await_if final_suspend() noexcept {
         // If the sauce is null, this coroutine has been detached
         // so await_ready should indicate true in order to clean up coroutine
-        return suspend_maybe{sauce == nullptr};
+        return async::await_if{sauce == nullptr};
     }
     // yielded value stored here
     T value;

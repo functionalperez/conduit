@@ -22,9 +22,9 @@ struct channel
 
     constexpr auto yield_value(T value) noexcept(move_T_noexcept) {
         this->value = std::move(value);
-        return awaitable_reference{message};
+        return async::deref{message};
     }
-    constexpr auto yield_value(get_message_t) { return awaitable_reference{message}; }
+    constexpr auto yield_value(get_message_t) { return async::deref{message}; }
 
     // true if template noexcept flag is marked true
     constexpr static bool is_noexcept = IsNoexcept;

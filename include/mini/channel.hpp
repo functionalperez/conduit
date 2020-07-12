@@ -14,12 +14,12 @@ struct channel {
     struct promise_type {
         Out current_value;
         In response;
-        awaitable_reference<In> yield_value(get_send_t) {
-            return awaitable_reference(response);
+        async::deref<In> yield_value(get_send_t) {
+            return async::deref(response);
         }
-        awaitable_reference<In> yield_value(Out value) {
+        async::deref<In> yield_value(Out value) {
             current_value = value;
-            return awaitable_reference(response);
+            return async::deref(response);
         }
 
         channel get_return_object() {
