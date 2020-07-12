@@ -1,5 +1,5 @@
 #pragma once
-#include <promises/channel_promise.hpp>
+#include <promises/channel.hpp>
 #include <unique_handle.hpp>
 
 template <class Promise>

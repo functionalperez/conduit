@@ -1,6 +1,6 @@
 #pragma once
 #include <awaitable_reference.hpp>
-#include <promises/generator_promise.hpp>
+#include <promises/generator.hpp>
 
 namespace promise {
 template <

@@ -1,5 +1,5 @@
 #pragma once
-#include <promises/generator_promise.hpp>
+#include <promises/generator.hpp>
 #include <unique_handle.hpp>
 
 template <class T, bool is_noexcept = true, bool generator_mode = check_first>
