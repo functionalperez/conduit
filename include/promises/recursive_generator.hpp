@@ -3,19 +3,22 @@
 #include <suspend_maybe.hpp>
 #include <unique_handle.hpp>
 
+struct nothing_t {
+    explicit nothing_t() = default;
+
+    template <class Coro>
+    operator Coro() const {
+        co_return nothing_t();
+    }
+};
+
+constexpr auto nothing = nothing_t();
+
+namespace promise {
 template <
     // Type output by generator
     class T>
 struct recursive_generator_promise;
-
-struct nothing_t {
-    explicit nothing_t() = default;
-
-    template <class T>
-    operator unique_handle<recursive_generator_promise<T>>() const;
-};
-
-constexpr auto nothing = nothing_t();
 
 template <
     // Type output by generator
@@ -74,11 +77,6 @@ struct recursive_generator_promise
     static T&& moved_T();
     constexpr static bool move_T_noexcept = noexcept(mutable_T() = moved_T());
 };
-
-template <class T>
-using recursive_generator = unique_handle<recursive_generator_promise<T>>;
-
-template <class T>
-nothing_t::operator recursive_generator<T>() const {
-    co_return nothing;
 }
+template <class T>
+using recursive_generator = unique_handle<promise::recursive_generator_promise<T>>;

@@ -1,6 +1,7 @@
 #pragma once
 #include <promises/promise_base.hpp>
 
+namespace promise {
 template <
     // Type output by generator
     class T,
@@ -42,3 +43,4 @@ struct generator_promise
     static T&& moved_T();
     constexpr static bool move_T_noexcept = is_noexcept || noexcept(mutable_T() = moved_T());
 };
+}

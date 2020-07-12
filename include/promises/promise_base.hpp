@@ -3,6 +3,7 @@
 #include <common.hpp>
 #include <unique_handle.hpp>
 
+namespace promise {
 template <bool suspend>
 struct initial_suspend_base {
     constexpr auto initial_suspend() noexcept {
@@ -77,3 +78,4 @@ struct promise_base : initial_suspend_base<traits::suspends_initially>,
 
     handle_type get_handle() { return handle_type::from_promise(static_cast<Promise&>(*this)); }
 };
+}

@@ -2,6 +2,7 @@
 #include <awaitable_reference.hpp>
 #include <promises/generator_promise.hpp>
 
+namespace promise {
 template <
     // Type output by generator
     class T, class Message,
@@ -34,3 +35,4 @@ struct channel_promise
     static T&& moved_T();
     constexpr static bool move_T_noexcept = is_noexcept || noexcept(mutable_T() = moved_T());
 };
+}
