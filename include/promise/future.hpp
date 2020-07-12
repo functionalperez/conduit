@@ -13,4 +13,4 @@ struct future : helper<future<ReturnValue>, suspend_initially> {
     void return_value(ReturnValue value) { returned_value = std::move(value); }
     ReturnValue get_value() { return std::move(returned_value); }
 };
-}
+} // namespace promise

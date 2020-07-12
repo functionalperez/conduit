@@ -39,7 +39,8 @@ struct return_void_base {
 template <>
 struct return_void_base<false> {};
 
-template<bool initial_suspend = false, bool final_suspend = true, bool needs_return = true, bool noexcept_ = true>
+template <bool initial_suspend = false, bool final_suspend = true, bool needs_return = true,
+          bool noexcept_ = true>
 struct traits {
     constexpr static bool suspends_initially = initial_suspend;
     constexpr static bool suspends_finally = final_suspend;
@@ -55,12 +56,11 @@ constexpr traits<> get_traits(auto const& promise);
 // used to implement coroutine promise objects
 template <
     // This is the class that derives from promise_base.
-    class Promise, 
-    class traits = decltype(get_traits(std::declval<Promise>()))>
+    class Promise, class traits = decltype(get_traits(std::declval<Promise>()))>
 struct helper : initial_suspend_base<traits::suspends_initially>,
-                      final_suspend_base<traits::suspends_finally>,
-                      return_void_base<traits::needs_return_void>,
-                      unhandled_exception_base<traits::is_noexcept> {
+                final_suspend_base<traits::suspends_finally>,
+                return_void_base<traits::needs_return_void>,
+                unhandled_exception_base<traits::is_noexcept> {
 
     using handle_type = std::coroutine_handle<Promise>;
 
@@ -79,4 +79,4 @@ struct helper : initial_suspend_base<traits::suspends_initially>,
 
     handle_type get_handle() { return handle_type::from_promise(static_cast<Promise&>(*this)); }
 };
-}
+} // namespace promise

@@ -8,4 +8,4 @@ struct jump {
     auto await_suspend(std::coroutine_handle<>) noexcept { return callback; }
     void await_resume() noexcept {}
 };
-}
+} // namespace async

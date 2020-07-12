@@ -8,4 +8,4 @@ struct await_if {
     constexpr void await_suspend(std::coroutine_handle<>) {}
     constexpr void await_resume() {}
 };
-}
+} // namespace async

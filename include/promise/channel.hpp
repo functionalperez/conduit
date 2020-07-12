@@ -8,7 +8,7 @@ template <
     class T, class Message,
     // Should funcitons be noexcept
     bool IsNoexcept = true,
-    
+
     bool InitialSuspend = false>
 struct channel
     : helper<channel<T, Message, IsNoexcept>, traits<InitialSuspend, true, true, IsNoexcept>> {
@@ -35,4 +35,4 @@ struct channel
     static T&& moved_T();
     constexpr static bool move_T_noexcept = is_noexcept || noexcept(mutable_T() = moved_T());
 };
-}
+} // namespace promise

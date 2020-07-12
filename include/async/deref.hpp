@@ -11,4 +11,4 @@ struct deref {
 };
 template <class T>
 deref(T&) -> deref<T>;
-}
+} // namespace async

@@ -12,8 +12,7 @@ struct unique_channel : public unique_handle<Promise> {
 };
 
 template <class T, class Message = T, bool is_noexcept = true, bool generator_mode = check_first>
-using channel =
-    unique_channel<promise::channel<T, Message, is_noexcept, generator_mode>>;
+using channel = unique_channel<promise::channel<T, Message, is_noexcept, generator_mode>>;
 
 template <class T, class Message, bool is_noexcept, bool which_first>
 auto& operator<<(channel<T, Message, is_noexcept, which_first>& ch,
