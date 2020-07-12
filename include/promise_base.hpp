@@ -23,8 +23,13 @@ struct final_suspend_base {
         }
     }
 };
-struct unhandled_exception_terminate_base {
+template <bool IsNoexcept = true>
+struct unhandled_exception_base {
     [[noreturn]] void unhandled_exception() noexcept { std::terminate(); }
+};
+template <>
+struct unhandled_exception_base<false> {
+    void unhandled_exception() noexcept {}
 };
 template <bool HasReturnVoid = true>
 struct return_void_base {
@@ -33,22 +38,28 @@ struct return_void_base {
 template <>
 struct return_void_base<false> {};
 
+template<bool initial_suspend = false, bool final_suspend = true, bool needs_return = true, bool noexcept_ = true>
+struct promise_traits {
+    constexpr static bool suspends_initially = initial_suspend;
+    constexpr static bool suspends_finally = final_suspend;
+    constexpr static bool needs_return_void = needs_return;
+    constexpr static bool is_noexcept = noexcept_;
+};
+using no_return_void = promise_traits<false, true, false, true>;
+
+constexpr promise_traits<> get_promise_traits(auto const& promise);
+
 // Implements a base type that encapsulates boilerplate code
 // used to implement coroutine promise objects
 template <
     // This is the class that derives from promise_base.
-    class Promise,
-    // And this determines whether or not initial_suspend returns
-    // suspend_always or suspend_never
-    bool SuspendInitially = true,
-    // Determines what final_suspend returns
-    bool SuspendFinally = true,
-    // This determines whether or not promise_base has return_void
-    bool HasReturnVoid = true>
-struct promise_base : initial_suspend_base<SuspendInitially>,
-                      final_suspend_base<SuspendFinally>,
-                      return_void_base<HasReturnVoid>,
-                      unhandled_exception_terminate_base {
+    class Promise, 
+    class traits = decltype(get_promise_traits(std::declval<Promise>()))>
+struct promise_base : initial_suspend_base<traits::suspends_initially>,
+                      final_suspend_base<traits::suspends_finally>,
+                      return_void_base<traits::needs_return_void>,
+                      unhandled_exception_base<traits::is_noexcept> {
+
     using handle_type = std::coroutine_handle<Promise>;
 
     // If there's an allocation failure, returns a null coroutine handle

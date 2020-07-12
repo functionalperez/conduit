@@ -7,10 +7,10 @@ template <
     class T, class Message,
     // Should funcitons be noexcept
     bool IsNoexcept = true,
-    // Should the coroutine always suspend initially
-    bool SuspendInitially = check_first>
+    
+    bool InitialSuspend = false>
 struct channel_promise
-    : promise_base<channel_promise<T, Message, IsNoexcept, SuspendInitially>, SuspendInitially> {
+    : promise_base<channel_promise<T, Message, IsNoexcept>, promise_traits<InitialSuspend, true, true, IsNoexcept>> {
     using message_type = Message;
 
     // yielded value stored here

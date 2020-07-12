@@ -8,8 +8,20 @@ template <
     bool IsNoexcept = true,
     // Should the coroutine always suspend initially
     bool SuspendInitially = check_first>
+struct generator_promise;
+
+template<class T, bool is_noexcept, bool suspends_initially>
+constexpr promise_traits<suspends_initially, true, true, is_noexcept> is_promise_noexcept(generator_promise<T, is_noexcept, suspends_initially> const&);
+
+template <
+    // Type output by generator
+    class T,
+    // Should funcitons be noexcept
+    bool IsNoexcept,
+    // Should the coroutine always suspend initially
+    bool SuspendInitially>
 struct generator_promise
-    : promise_base<generator_promise<T, IsNoexcept, SuspendInitially>, SuspendInitially> {
+    : promise_base<generator_promise<T, IsNoexcept, SuspendInitially>> {
 
     // yielded value stored here
     T value;

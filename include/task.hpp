@@ -4,7 +4,7 @@
 #include <unique_handle.hpp>
 
 template <class ReturnValue>
-struct future_promise : promise_base<future_promise<ReturnValue>, true, false> {
+struct future_promise : promise_base<future_promise<ReturnValue>> {
     std::coroutine_handle<> callback = std::noop_coroutine();
     ReturnValue returned_value = {};
 

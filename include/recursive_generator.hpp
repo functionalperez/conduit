@@ -5,11 +5,7 @@
 
 template <
     // Type output by generator
-    class T,
-    // Should funcitons be noexcept
-    bool IsNoexcept = true,
-    // Should the coroutine always suspend initially
-    bool SuspendInitially = check_first>
+    class T>
 struct recursive_generator_promise;
 
 struct nothing_t {
@@ -23,21 +19,11 @@ constexpr auto nothing = nothing_t();
 
 template <
     // Type output by generator
-    class T,
-    // Should funcitons be noexcept
-    bool IsNoexcept,
-    // Should the coroutine always suspend initially
-    bool SuspendInitially>
+    class T>
 struct recursive_generator_promise
-    : promise_base< recursive_generator_promise<T, IsNoexcept, SuspendInitially>
-                  , SuspendInitially
-                  , true
-                  , false> {
+    : promise_base< recursive_generator_promise<T>, no_return_void> {
 
-    using base_type = promise_base< recursive_generator_promise<T, IsNoexcept, SuspendInitially>
-                                  , SuspendInitially
-                                  , true
-                                  , false>;
+    using base_type = promise_base<recursive_generator_promise, no_return_void>;
     using return_object = unique_handle<recursive_generator_promise>;
 
    public:
@@ -81,9 +67,6 @@ struct recursive_generator_promise
         this->value = std::move(value);
         return std::suspend_always{};
     }
-
-    // true if template noexcept flag is marked true
-    constexpr static bool is_noexcept = IsNoexcept;
 
    private:
     // These are just used to get a reference to T in template expressions
