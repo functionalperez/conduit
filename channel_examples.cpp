@@ -67,7 +67,7 @@ channel<int> sum_messages() {
 void example_channel() {
     auto ch = sum_messages();
     for (int i = 0; i <= 10; i++) {
-        int result;
+        int result = 0;
         ch << i >> result;
         std::cout << "Sum so far: " << result << '\n';
     }
