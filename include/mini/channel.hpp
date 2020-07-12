@@ -1,5 +1,5 @@
 #pragma once
-#include <awaitable_reference.hpp>
+#include <async/deref.hpp>
 #include <common.hpp>
 
 namespace mini {
