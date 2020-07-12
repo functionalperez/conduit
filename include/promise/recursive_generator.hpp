@@ -1,5 +1,5 @@
 #pragma once
-#include <promises/promise_base.hpp>
+#include <promise/promise_base.hpp>
 #include <suspend_maybe.hpp>
 #include <unique_handle.hpp>
 

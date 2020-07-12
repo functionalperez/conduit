@@ -1,6 +1,6 @@
 #pragma once
 #include <awaitable_callback.hpp>
-#include <promises/promise_base.hpp>
+#include <promise/promise_base.hpp>
 #include <unique_handle.hpp>
 
 namespace promise {

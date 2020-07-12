@@ -1,7 +1,7 @@
-#include <promises/minimal.hpp>
-#include <promises/recursive_generator.hpp>
+#include <promise/minimal.hpp>
+#include <promise/recursive_generator.hpp>
 
-#include <promises/future.hpp>
+#include <promise/future.hpp>
 
 #include "channel_examples.cpp"
 
