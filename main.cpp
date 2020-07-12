@@ -1,4 +1,4 @@
-#include <conduit/promise/minimal.hpp>
+#include <conduit/co_void.hpp>
 #include <conduit/promise/recursive_generator.hpp>
 
 #include <conduit/async/future.hpp>
@@ -24,7 +24,7 @@ generator<int> bar() {
     co_yield 5;
 }
 
-minimal_coro foo() {
+co_void foo() {
     print_ordered("Started coroutine");
     auto* promise = co_yield get_promise;
     print_ordered("Promise at ", (void*)promise);
