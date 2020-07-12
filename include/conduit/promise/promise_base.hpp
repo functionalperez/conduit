@@ -3,7 +3,7 @@
 #include <conduit/common.hpp>
 #include <conduit/unique_handle.hpp>
 
-namespace promise {
+namespace conduit::promise {
 template <bool suspend>
 struct initial_suspend_base {
     constexpr auto initial_suspend() noexcept {
@@ -79,4 +79,4 @@ struct helper : initial_suspend_base<traits::suspends_initially>,
 
     handle_type get_handle() { return handle_type::from_promise(static_cast<Promise&>(*this)); }
 };
-} // namespace promise
+} // namespace conduit::promise

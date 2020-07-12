@@ -1,6 +1,7 @@
 #pragma once
 #include <conduit/concepts.hpp>
 
+namespace conduit {
 struct get_promise_t {
     explicit get_promise_t() = default;
 };
@@ -22,3 +23,5 @@ struct nothing_t {
     }
 };
 constexpr auto nothing = nothing_t();
+
+} // namespace conduit

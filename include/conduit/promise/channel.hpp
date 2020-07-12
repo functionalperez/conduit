@@ -2,7 +2,7 @@
 #include <conduit/async/deref.hpp>
 #include <conduit/promise/generator.hpp>
 
-namespace promise {
+namespace conduit::promise {
 template <
     // Type output by generator
     class T, class Message,
@@ -35,4 +35,4 @@ struct channel
     static T&& moved_T();
     constexpr static bool move_T_noexcept = is_noexcept || noexcept(mutable_T() = moved_T());
 };
-} // namespace promise
+} // namespace conduit::promise

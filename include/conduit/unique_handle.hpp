@@ -2,6 +2,7 @@
 #include <conduit/common.hpp>
 #include <conduit/iterator.hpp>
 
+namespace conduit {
 template <class Promise>
 struct unique_handle : private std::coroutine_handle<Promise> {
    private:
@@ -152,3 +153,4 @@ auto end(unique_handle<T>&) {
     // about the coroutine handle
     return coro_sentinal{};
 }
+} // namespace conduit

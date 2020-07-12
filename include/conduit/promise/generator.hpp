@@ -1,7 +1,7 @@
 #pragma once
 #include <conduit/promise/promise_base.hpp>
 
-namespace promise {
+namespace conduit::promise {
 template <
     // Type output by generator
     class T,
@@ -43,4 +43,4 @@ struct generator : helper<generator<T, IsNoexcept, SuspendInitially>> {
     static T&& moved_T();
     constexpr static bool move_T_noexcept = is_noexcept || noexcept(mutable_T() = moved_T());
 };
-} // namespace promise
+} // namespace conduit::promise

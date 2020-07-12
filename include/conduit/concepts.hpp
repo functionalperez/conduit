@@ -1,6 +1,7 @@
 #pragma once
 #include <coroutine>
 
+namespace conduit {
 template <class T>
 using promise_t = typename std::coroutine_traits<T>::promise_type;
 
@@ -21,3 +22,4 @@ template <class Coro, class type>
 concept can_co_return = coroutine_type<Coro>&& requires(promise_t<Coro> promise, type t) {
     promise.return_value(t);
 };
+} // namespace conduit

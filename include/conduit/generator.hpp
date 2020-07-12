@@ -2,6 +2,7 @@
 #include <conduit/promise/generator.hpp>
 #include <conduit/unique_handle.hpp>
 
+namespace conduit {
 template <class T, bool is_noexcept = true, bool generator_mode = check_first>
 using generator = unique_handle<promise::generator<T, is_noexcept, generator_mode>>;
 
@@ -21,3 +22,4 @@ bool operator>>(generator<T, is_noexcept, resume_first>& g, T& value) noexcept(i
     value = g->value;
     return true;
 }
+} // namespace conduit

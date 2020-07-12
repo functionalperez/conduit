@@ -3,7 +3,7 @@
 #include <conduit/promise/promise_base.hpp>
 #include <conduit/unique_handle.hpp>
 
-namespace promise {
+namespace conduit::promise {
 template <
     // Type output by generator
     class T>
@@ -65,6 +65,8 @@ struct recursive_generator : helper<recursive_generator<T>, no_return_void> {
     static T&& moved_T();
     constexpr static bool move_T_noexcept = noexcept(mutable_T() = moved_T());
 };
-} // namespace promise
+} // namespace conduit::promise
+namespace conduit {
 template <class T>
 using recursive_generator = unique_handle<promise::recursive_generator<T>>;
+}

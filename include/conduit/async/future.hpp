@@ -1,7 +1,7 @@
 #include <conduit/promise/future.hpp>
 #include <conduit/unique_handle.hpp>
 
-namespace async {
+namespace conduit::async {
 template <class T>
 struct future : unique_handle<promise::future<T>> {
     using super = unique_handle<promise::future<T>>;
@@ -14,4 +14,4 @@ struct future : unique_handle<promise::future<T>> {
     }
     auto await_resume() { return super::promise().get_value(); }
 };
-} // namespace async
+} // namespace conduit::async

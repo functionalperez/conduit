@@ -2,7 +2,7 @@
 #include <conduit/async/callback.hpp>
 #include <conduit/promise/promise_base.hpp>
 
-namespace promise {
+namespace conduit::promise {
 template <class ReturnValue>
 struct future : helper<future<ReturnValue>, suspend_initially> {
     std::coroutine_handle<> callback = std::noop_coroutine();
@@ -13,4 +13,4 @@ struct future : helper<future<ReturnValue>, suspend_initially> {
     void return_value(ReturnValue value) { returned_value = std::move(value); }
     ReturnValue get_value() { return std::move(returned_value); }
 };
-} // namespace promise
+} // namespace conduit::promise

@@ -3,6 +3,8 @@
 #include <conduit/generator.hpp>
 #include <iostream>
 
+using namespace conduit;
+
 template <bool is_suspended_initially = check_first>
 generator<int, true, is_suspended_initially> counter(int initial, int max,
                                                      int inc) {

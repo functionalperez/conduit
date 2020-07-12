@@ -8,6 +8,8 @@
 #include <iostream>
 #include <string_view>
 
+using namespace conduit;
+
 void print_ordered(auto... args) {
     static int event = 1;
     std::cout << event << ")\t";

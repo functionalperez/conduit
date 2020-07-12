@@ -1,7 +1,7 @@
 #pragma once
 #include <conduit/common.hpp>
 
-namespace async {
+namespace conduit::async {
 template <class T>
 struct deref {
     T& value;
@@ -11,4 +11,4 @@ struct deref {
 };
 template <class T>
 deref(T&) -> deref<T>;
-} // namespace async
+} // namespace conduit::async

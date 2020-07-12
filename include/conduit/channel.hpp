@@ -2,6 +2,7 @@
 #include <conduit/promise/channel.hpp>
 #include <conduit/unique_handle.hpp>
 
+namespace conduit {
 template <class Promise>
 struct unique_channel : public unique_handle<Promise> {
     using message_type = typename Promise::message_type;
@@ -35,3 +36,4 @@ bool operator>>(channel<T, Message, is_noexcept, resume_first>& g, T& value) noe
     value = g->value;
     return true;
 }
+} // namespace conduit

@@ -1,5 +1,6 @@
 #pragma once
 
+namespace conduit {
 struct coro_sentinal {};
 
 constexpr auto deref_current_value = [](auto coroutine_handle) -> decltype(auto) {
@@ -33,3 +34,5 @@ template <class handle>
 coro_iterator(handle) -> coro_iterator<handle>;
 template <class handle, class deref>
 coro_iterator(handle, deref) -> coro_iterator<handle, deref>;
+
+} // namespace conduit

@@ -1,6 +1,7 @@
 #pragma once
 #include <conduit/common.hpp>
 
+namespace conduit {
 template <class Promise>
 struct awaitable_promise_object {
     Promise& promise;
@@ -8,3 +9,4 @@ struct awaitable_promise_object {
     constexpr void await_suspend(std::coroutine_handle<>) noexcept {}
     constexpr Promise* await_resume() noexcept { return &promise; }
 };
+} // namespace conduit
