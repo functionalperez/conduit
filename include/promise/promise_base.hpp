@@ -47,6 +47,7 @@ struct traits {
     constexpr static bool is_noexcept = noexcept_;
 };
 using no_return_void = traits<false, true, false, true>;
+using suspend_initially = traits<true>;
 
 constexpr traits<> get_traits(auto const& promise);
 

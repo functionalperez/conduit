@@ -1,7 +1,7 @@
 #include <promise/minimal.hpp>
 #include <promise/recursive_generator.hpp>
 
-#include <promise/future.hpp>
+#include <async/future.hpp>
 
 #include "channel_examples.cpp"
 
@@ -50,11 +50,11 @@ auto nums(int initial = 0) -> recursive_generator<long> {
     co_return nums(initial + 1);
 }
 
-future<int> t1() {
+async::future<int> t1() {
     std::cout << "Doing t1\n";
     co_return 4;
 }
-future<int> t2() {
+async::future<int> t2() {
     std::cout << "Recieved " << co_await t1() << '\n';
     co_return 5;
 }
