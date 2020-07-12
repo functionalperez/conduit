@@ -29,11 +29,15 @@ template <
     // Should the coroutine always suspend initially
     bool SuspendInitially>
 struct recursive_generator_promise
-    : promise_base<recursive_generator_promise<T, IsNoexcept, SuspendInitially>, SuspendInitially,
-                   false> {
+    : promise_base< recursive_generator_promise<T, IsNoexcept, SuspendInitially>
+                  , SuspendInitially
+                  , true
+                  , false> {
 
-    using base_type = promise_base<recursive_generator_promise<T, IsNoexcept, SuspendInitially>,
-                                   SuspendInitially, false>;
+    using base_type = promise_base< recursive_generator_promise<T, IsNoexcept, SuspendInitially>
+                                  , SuspendInitially
+                                  , true
+                                  , false>;
     using return_object = unique_handle<recursive_generator_promise>;
 
    public:

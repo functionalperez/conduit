@@ -3,31 +3,35 @@
 #include <common.hpp>
 #include <unique_handle.hpp>
 
-// This is an incomplete promise_base
-template <bool SuspendInitially, bool HasReturnVoid = true>
-struct promise_base_base {
+template <bool suspend>
+struct initial_suspend_base {
     constexpr auto initial_suspend() noexcept {
-        if constexpr (SuspendInitially)
+        if constexpr (suspend) {
             return std::suspend_always{};
-        else
+        } else {
             return std::suspend_never{};
+        }
     }
-    constexpr auto final_suspend() noexcept { return std::suspend_always(); }
+};
+template <bool suspend>
+struct final_suspend_base {
+    constexpr auto final_suspend() noexcept {
+        if constexpr (suspend) {
+            return std::suspend_always{};
+        } else {
+            return std::suspend_never{};
+        }
+    }
+};
+struct unhandled_exception_terminate_base {
     [[noreturn]] void unhandled_exception() noexcept { std::terminate(); }
+};
+template <bool HasReturnVoid = true>
+struct return_void_base {
     constexpr void return_void() noexcept {}
 };
-// This is an incomplete promise_base
-template <bool SuspendInitially>
-struct promise_base_base<SuspendInitially, false> {
-    constexpr auto initial_suspend() noexcept {
-        if constexpr (SuspendInitially)
-            return std::suspend_always{};
-        else
-            return std::suspend_never{};
-    }
-    constexpr auto final_suspend() noexcept { return std::suspend_always(); }
-    [[noreturn]] void unhandled_exception() noexcept { std::terminate(); }
-};
+template <>
+struct return_void_base<false> {};
 
 // Implements a base type that encapsulates boilerplate code
 // used to implement coroutine promise objects
@@ -37,9 +41,14 @@ template <
     // And this determines whether or not initial_suspend returns
     // suspend_always or suspend_never
     bool SuspendInitially = true,
+    // Determines what final_suspend returns
+    bool SuspendFinally = true,
     // This determines whether or not promise_base has return_void
     bool HasReturnVoid = true>
-struct promise_base : promise_base_base<SuspendInitially, HasReturnVoid> {
+struct promise_base : initial_suspend_base<SuspendInitially>,
+                      final_suspend_base<SuspendFinally>,
+                      return_void_base<HasReturnVoid>,
+                      unhandled_exception_terminate_base {
     using handle_type = std::coroutine_handle<Promise>;
 
     // If there's an allocation failure, returns a null coroutine handle
