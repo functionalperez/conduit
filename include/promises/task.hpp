@@ -17,13 +17,13 @@ struct future : helper<future<ReturnValue>> {
 }
 template <class T>
 struct future : unique_handle<promise::future<T>> {
-    using base_type = unique_handle<promise::future<T>>;
-    using base_type::base_type;
+    using super = unique_handle<promise::future<T>>;
+    using super::super;
 
-    bool await_ready() noexcept { return base_type::done(); }
+    bool await_ready() noexcept { return super::done(); }
     auto await_suspend(std::coroutine_handle<> callback) noexcept {
-        base_type::promise().set_callback(callback);
-        return base_type::get_raw_handle();
+        super::promise().set_callback(callback);
+        return super::get_raw_handle();
     }
-    auto await_resume() { return base_type::promise().get_value(); }
+    auto await_resume() { return super::promise().get_value(); }
 };

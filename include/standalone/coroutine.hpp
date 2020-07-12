@@ -9,24 +9,24 @@ struct coroutine_deleter {
 };
 class coroutine_promise;
 class coroutine : private std::unique_ptr<void, coroutine_deleter<coroutine_promise>> {
-    using base_type = std::unique_ptr<void, coroutine_deleter<coroutine_promise>>;
-    base_type& as_base() noexcept { return *this; }
+    using super = std::unique_ptr<void, coroutine_deleter<coroutine_promise>>;
+    super& as_base() noexcept { return *this; }
 
    public:
-    using base_type::get;
-    using base_type::reset;
+    using super::get;
+    using super::reset;
     using promise_type = coroutine_promise;
     using handle = std::coroutine_handle<promise_type>;
     coroutine() = default;
     coroutine(coroutine const&) = delete;
     coroutine(coroutine&&) = default;
-    explicit coroutine(std::nullptr_t) noexcept : base_type(nullptr) {}
+    explicit coroutine(std::nullptr_t) noexcept : super(nullptr) {}
     explicit coroutine(coroutine_promise& promise) noexcept
         : coroutine(handle::from_promise(promise)) {}
-    explicit coroutine(handle h) noexcept : base_type(h) {}
+    explicit coroutine(handle h) noexcept : super(h) {}
 
     coroutine& operator=(coroutine other) {
-        base_type::swap(other);
+        super::swap(other);
         return *this;
     }
     coroutine& operator=(std::nullptr_t) {

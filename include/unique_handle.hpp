@@ -14,8 +14,8 @@ struct unique_handle : private std::coroutine_handle<Promise> {
     constexpr static bool is_noexcept = Promise::is_noexcept;
     // This is used by the compiler to generate the coroutine frame
     using promise_type = Promise;
-    // unique_handle inherits from base_type
-    using base_type = std::coroutine_handle<Promise>;
+    // unique_handle inherits from super
+    using super = std::coroutine_handle<Promise>;
     // Type of the coroutine handle
     using handle = std::coroutine_handle<Promise>;
 
@@ -25,15 +25,15 @@ struct unique_handle : private std::coroutine_handle<Promise> {
                        decltype(declPromise().initial_suspend())>;
 
     // Returns true if the coroutine handle isn't null
-    using base_type::operator bool;
+    using super::operator bool;
     // Checks if the coroutine has finished executing
-    using base_type::done;
+    using super::done;
     // Resumes execution of the coroutine
-    using base_type::resume;
+    using super::resume;
     // Obtains the promise object
-    using base_type::promise;
+    using super::promise;
     // Obtains the coroutine handle as a void*
-    using base_type::address;
+    using super::address;
 
     // Creates a unique_handle from the promise_type object in the
     // coroutine_frame
@@ -46,19 +46,19 @@ struct unique_handle : private std::coroutine_handle<Promise> {
     }
 
     // constructs a unique_handle from a coroutine handle
-    unique_handle(std::coroutine_handle<Promise> h) : base_type(h) {
+    unique_handle(std::coroutine_handle<Promise> h) : super(h) {
         if constexpr(is_return_object_aware) {
             promise().set_return_object(this);
         }
     }
-    unique_handle(promise_type& h) : base_type(base_type::from_promise(h)) {
+    unique_handle(promise_type& h) : super(super::from_promise(h)) {
         if constexpr(is_return_object_aware) {
             h.set_return_object(this);
         }
     }
     unique_handle(unique_handle const&) = delete;
-    unique_handle(unique_handle&& source) : base_type(source) {
-        source.base_type::operator=(nullptr);
+    unique_handle(unique_handle&& source) : super(source) {
+        source.super::operator=(nullptr);
         if constexpr(is_return_object_aware) {
             promise().set_return_object(nullptr);
         }
@@ -79,8 +79,8 @@ struct unique_handle : private std::coroutine_handle<Promise> {
     // Releases ownership of the coroutine handle and returns the handle
     // This is reset to null but the coroutine is NOT destroyed
     std::coroutine_handle<Promise> release() noexcept {
-        base_type h = get();
-        base_type::operator=(nullptr);
+        super h = get();
+        super::operator=(nullptr);
         if constexpr(is_return_object_aware) {
             h.promise().set_return_object(nullptr);
         }
@@ -89,8 +89,8 @@ struct unique_handle : private std::coroutine_handle<Promise> {
     // destroys the coroutine and resets the coroutine_handle to null
     void reset(std::nullptr_t = nullptr) {
         if (*this) {
-            base_type::destroy();
-            base_type::operator=(nullptr);
+            super::destroy();
+            super::operator=(nullptr);
         }
     }
     // Assigns another unique_handle without invoking destroy
@@ -99,8 +99,8 @@ struct unique_handle : private std::coroutine_handle<Promise> {
         if constexpr(is_return_object_aware) {
             promise().set_return_object(nullptr);
         }
-        base_type::operator=(other.get());
-        other.base_type::operator=(nullptr);
+        super::operator=(other.get());
+        other.super::operator=(nullptr);
         if constexpr(is_return_object_aware) {
             promise().set_return_object(this);
         }
@@ -108,15 +108,15 @@ struct unique_handle : private std::coroutine_handle<Promise> {
     // destroys the coroutine and replaces the coroutine handle with p
     void reset(std::coroutine_handle<Promise> p) {
         if (*this) {
-            base_type::destroy();
-            base_type::operator=(p);
+            super::destroy();
+            super::operator=(p);
         }
     }
     // Swaps this handle with another unique_handle
     void swap(unique_handle& other) noexcept {
-        base_type tmp = *this;
-        base_type::operator=(other);
-        other.base_type::operator=(tmp);
+        super tmp = *this;
+        super::operator=(other);
+        other.super::operator=(tmp);
         if constexpr(is_return_object_aware) {
             (*this)->set_return_object(this);
             other->set_return_object(&other);
@@ -124,7 +124,7 @@ struct unique_handle : private std::coroutine_handle<Promise> {
     }
     // Obtains a copy of the coroutine handle
     constexpr std::coroutine_handle<Promise> get() noexcept {
-        base_type tmp = *this;
+        super tmp = *this;
         return tmp;
     }
     constexpr std::coroutine_handle<> get_raw_handle() noexcept {
@@ -134,11 +134,11 @@ struct unique_handle : private std::coroutine_handle<Promise> {
     void destroy() { reset(); }
     ~unique_handle() {
         if (*this) {
-            base_type::destroy();
+            super::destroy();
         }
     }
     // Accesses the coroutine promise
-    promise_type* operator->() noexcept { return &base_type::promise(); }
+    promise_type* operator->() noexcept { return &super::promise(); }
 };
 
 template <class T>

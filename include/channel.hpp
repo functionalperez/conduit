@@ -5,10 +5,10 @@
 template <class Promise>
 struct unique_channel : public unique_handle<Promise> {
     using message_type = typename Promise::message_type;
-    using base_type = unique_handle<Promise>;
-    using base_type::base_type;
+    using super = unique_handle<Promise>;
+    using super::super;
 
-    void send(message_type const& message) { base_type::promise().message = message; }
+    void send(message_type const& message) { super::promise().message = message; }
 };
 
 template <class T, class Message = T, bool is_noexcept = true, bool generator_mode = check_first>

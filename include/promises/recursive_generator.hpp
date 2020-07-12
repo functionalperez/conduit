@@ -26,14 +26,14 @@ template <
 struct recursive_generator
     : helper< recursive_generator<T>, no_return_void> {
 
-    using base_type = helper<recursive_generator, no_return_void>;
+    using super = helper<recursive_generator, no_return_void>;
     using return_object = unique_handle<recursive_generator>;
 
    public:
     return_object* sauce = nullptr;
 
    public:
-    using base_type::yield_value;
+    using super::yield_value;
 
     /* --- IMPORTANT --- */
     /*
@@ -48,7 +48,7 @@ struct recursive_generator
         The workaround is to explicitly create a get_return_object that returns a unique_handle
         in classes for which the ordering of initial_suspend and get_return_object is important.
     */
-    auto get_return_object() { return return_object{base_type::get_handle()}; }
+    auto get_return_object() { return return_object{super::get_handle()}; }
     void set_return_object(return_object* sauce) { this->sauce = sauce; }
 
     void return_value(return_object new_generator) {
