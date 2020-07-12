@@ -1,6 +1,6 @@
 #pragma once
 #include <awaitable_reference.hpp>
-#include <generator_promise.hpp>
+#include <promises/generator_promise.hpp>
 
 template <
     // Type output by generator

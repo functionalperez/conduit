@@ -1,6 +1,6 @@
 #pragma once
 #include <awaitable_callback.hpp>
-#include <promise_base.hpp>
+#include <promises/promise_base.hpp>
 #include <unique_handle.hpp>
 
 template <class ReturnValue>

@@ -1,5 +1,5 @@
 #pragma once
-#include <promise_base.hpp>
+#include <promises/promise_base.hpp>
 #include <suspend_maybe.hpp>
 #include <unique_handle.hpp>
 
@@ -72,7 +72,7 @@ struct recursive_generator_promise
     // These are just used to get a reference to T in template expressions
     static T& mutable_T();
     static T&& moved_T();
-    constexpr static bool move_T_noexcept = is_noexcept || noexcept(mutable_T() = moved_T());
+    constexpr static bool move_T_noexcept = noexcept(mutable_T() = moved_T());
 };
 
 template <class T>

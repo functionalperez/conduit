@@ -1,5 +1,5 @@
 #pragma once
-#include <promise_base.hpp>
+#include <promises/promise_base.hpp>
 
 template <
     // Type output by generator
