@@ -3,17 +3,6 @@
 #include <async/await_if.hpp>
 #include <unique_handle.hpp>
 
-struct nothing_t {
-    explicit nothing_t() = default;
-
-    template <class Coro>
-    operator Coro() const {
-        co_return nothing_t();
-    }
-};
-
-constexpr auto nothing = nothing_t();
-
 namespace promise {
 template <
     // Type output by generator
