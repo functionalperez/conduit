@@ -1,6 +1,7 @@
 #include <coroutine>
 #include <exception>
 
+// Compiler version resulting in bug: gcc 10.0.1 20200411 (experimental) 
 // compile with:
 // g++-10 -std=c++20 -fcoroutines detach_bug.cpp
 
