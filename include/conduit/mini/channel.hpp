@@ -1,6 +1,6 @@
 #pragma once
-#include <async/deref.hpp>
-#include <common.hpp>
+#include <conduit/async/deref.hpp>
+#include <conduit/common.hpp>
 
 namespace mini {
 

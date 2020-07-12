@@ -1,6 +1,6 @@
 #pragma once
-#include <promise/promise_base.hpp>
-#include <unique_handle.hpp>
+#include <conduit/promise/promise_base.hpp>
+#include <conduit/unique_handle.hpp>
 
 namespace promise {
 struct minimal : helper<minimal> {};

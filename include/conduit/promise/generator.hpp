@@ -1,5 +1,5 @@
 #pragma once
-#include <promise/promise_base.hpp>
+#include <conduit/promise/promise_base.hpp>
 
 namespace promise {
 template <

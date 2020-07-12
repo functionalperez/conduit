@@ -1,5 +1,5 @@
 #pragma once
-#include <common.hpp>
+#include <conduit/common.hpp>
 #include <iostream>
 
 namespace mini {

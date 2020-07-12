@@ -1,6 +1,6 @@
 #pragma once
-#include <promise/channel.hpp>
-#include <unique_handle.hpp>
+#include <conduit/promise/channel.hpp>
+#include <conduit/unique_handle.hpp>
 
 template <class Promise>
 struct unique_channel : public unique_handle<Promise> {

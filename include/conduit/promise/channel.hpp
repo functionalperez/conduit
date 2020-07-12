@@ -1,6 +1,6 @@
 #pragma once
-#include <async/deref.hpp>
-#include <promise/generator.hpp>
+#include <conduit/async/deref.hpp>
+#include <conduit/promise/generator.hpp>
 
 namespace promise {
 template <

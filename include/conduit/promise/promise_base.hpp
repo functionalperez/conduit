@@ -1,7 +1,7 @@
 #pragma once
-#include <await_promise_object.hpp>
-#include <common.hpp>
-#include <unique_handle.hpp>
+#include <conduit/await_promise_object.hpp>
+#include <conduit/common.hpp>
+#include <conduit/unique_handle.hpp>
 
 namespace promise {
 template <bool suspend>

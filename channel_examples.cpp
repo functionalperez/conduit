@@ -1,6 +1,6 @@
 #pragma once
-#include <channel.hpp>
-#include <generator.hpp>
+#include <conduit/channel.hpp>
+#include <conduit/generator.hpp>
 #include <iostream>
 
 template <bool is_suspended_initially = check_first>
