@@ -1,5 +1,5 @@
 #pragma once
-#include <conduit/await_promise_object.hpp>
+#include <conduit/async/await_promise_object.hpp>
 #include <conduit/common.hpp>
 #include <conduit/unique_handle.hpp>
 
@@ -70,9 +70,9 @@ struct helper : initial_suspend_base<traits::suspends_initially>,
     // Allows you access to the promise object from within a coroutine via
     // auto& promise = co_yield get_promise;
     // await_ready() always returns true
-    awaitable_promise_object<Promise> yield_value(get_promise_t) {
-        return awaitable_promise_object<Promise>{static_cast<Promise&>(*this)};
-    }
+    auto yield_value(get_promise_t) { return async::immediate_value{static_cast<Promise*>(this)}; }
+
+    auto yield_value(get_handle_t) { return async::immediate_value{get_handle()}; }
 
     // Used by the compiler to produce the return_object when starting the coroutine
     handle_type get_return_object() noexcept { return get_handle(); }

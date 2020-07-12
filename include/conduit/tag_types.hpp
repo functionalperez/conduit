@@ -7,6 +7,11 @@ struct get_promise_t {
 };
 constexpr auto get_promise = get_promise_t();
 
+struct get_handle_t {
+    explicit get_handle_t() = default;
+};
+constexpr auto get_handle = get_handle_t();
+
 struct get_message_t {
     explicit get_message_t() = default;
 };
