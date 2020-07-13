@@ -7,10 +7,25 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 include(CTest)
 enable_testing()
 
-add_compile_options("-fcoroutines")
+message("${CMAKE_CXX_COMPILER_ID}")
+
+if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang" )
+  set(COROUTINE_FLAG "-fcoroutines-ts")
+else ()
+  set(COROUTINE_FLAG "-fcoroutines")
+endif ()
+
+add_compile_options("${COROUTINE_FLAG}")
+
 include_directories(include)
 
+set(THREADS_PREFER_PTHREAD_FLAG ON)
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+find_package(Threads REQUIRED)
+
 add_executable(conduit main.cpp)
+
+target_link_libraries(conduit PRIVATE Threads::Threads)
 
 set(CPACK_PROJECT_NAME ${PROJECT_NAME})
 set(CPACK_PROJECT_VERSION ${PROJECT_VERSION})
