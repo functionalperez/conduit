@@ -103,6 +103,12 @@ struct unique_handle : private std::coroutine_handle<Promise> {
             promise().set_return_object(this);
         }
     }
+    constexpr void assign_no_destroy(std::coroutine_handle<Promise> other) noexcept {
+        super::operator=(other);
+        if constexpr (is_return_object_aware) {
+            promise().set_return_object(this);
+        }
+    }
     // destroys the coroutine and replaces the coroutine handle with p
     void reset(std::coroutine_handle<Promise> p) {
         if (*this) {
@@ -121,11 +127,11 @@ struct unique_handle : private std::coroutine_handle<Promise> {
         }
     }
     // Obtains a copy of the coroutine handle
-    constexpr std::coroutine_handle<Promise> get() noexcept {
+    constexpr std::coroutine_handle<Promise> get() const noexcept {
         super tmp = *this;
         return tmp;
     }
-    constexpr std::coroutine_handle<> get_raw_handle() noexcept { return *this; }
+    constexpr std::coroutine_handle<> get_raw_handle() const noexcept { return *this; }
     // Destroys the coroutine and resets the handle to null
     void destroy() { reset(); }
     ~unique_handle() {
