@@ -1,34 +1,34 @@
 #include <conduit/co_void.hpp>
+#include <conduit/source.hpp>
+#include <conduit/task.hpp>
 #include <conduit/void_coro.hpp>
 #include <iostream>
 
-using conduit::co_void;
+using namespace conduit;
 
-co_void foo() {
-    std::cout << "Hello, world!\n";
-    co_await std::suspend_always{};
-    std::cout << "Goodbye, world\n";
+source<int> bar() {
+    co_yield 10;
+    co_yield 20;
+    co_yield 30;
 }
-conduit::void_coro evil_coro(std::coroutine_handle<conduit::promise::void_coro>& handle) {
-    handle = co_yield conduit::get_handle;
-
-    std::cout << "Hello, world!\n";
-
-    co_await std::suspend_always{};
-
-    std::cout << "Goodbye, world!\n";
+task simple_task() {
+    std::cout << "Doing task\n";
+    co_return;
 }
 
-int main() {
-    std::coroutine_handle<conduit::promise::void_coro> handle;
-    bool success = evil_coro(handle);
-    if(!success) {
-        std::cout << "Failed\n";
-        return 1;
+void_coro foo() {
+    auto sauce = bar();
+    while (auto value = co_await async::on_coro{sauce}) {
+        std::cout << *value << '\n';
     }
-
-    std::cout << "[Paused]\n";
-
-    handle.resume();
-
+    std::cout << "No more values\n" << std::flush;
+    co_await async::on_coro{simple_task()};
+    std::cout << "Completed task\n";
+}
+void_coro tiny() {
+    co_return ;
+}
+int main() {
+    foo();
+    std::cout << "Exiting main\n";
 }
