@@ -29,4 +29,6 @@ class optional_ref {
         return pointer ? T(std::move(*pointer)) : T(std::forward<U>(default_value));
     }
 };
+template<class T>
+optional_ref(T&) -> optional_ref<T>;
 } // namespace conduit
