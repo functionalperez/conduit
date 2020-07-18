@@ -9,13 +9,9 @@ enable_testing()
 
 message("${CMAKE_CXX_COMPILER_ID}")
 
-if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang" )
-  set(COROUTINE_FLAG "-fcoroutines-ts")
-else ()
-  set(COROUTINE_FLAG "-fcoroutines")
-endif ()
-
-add_compile_options("${COROUTINE_FLAG}")
+if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU" )
+  add_compile_options("-fcoroutines")
+endif()
 
 include_directories(include)
 
