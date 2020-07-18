@@ -1,3 +1,5 @@
+#pragma once
+
 #include <conduit/common.hpp>
 #include <utility>
 
