@@ -45,7 +45,7 @@ struct recursive_generator : helper<recursive_generator<T>, no_return_void> {
     void return_value(nothing_t) {}
 
     async::await_if final_suspend() noexcept {
-        // If the sauce is null, this coroutine has been detached
+        // If the sauce is null, this coroutine has been void_coro
         // so await_ready should indicate true in order to clean up coroutine
         return async::await_if{sauce == nullptr};
     }
