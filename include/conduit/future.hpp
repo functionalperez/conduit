@@ -9,7 +9,7 @@ struct future : unique_handle<promise::future<T>> {
     using super = unique_handle<promise::future<T>>;
     using super::super;
 
-    auto value() & { return async::on_coro{*this}; }
-    auto value() && { return async::on_coro{std::move(*this)}; }
+    auto operator co_await() & { return async::on_coro{*this}; }
+    auto operator co_await() && { return async::on_coro{std::move(*this)}; }
 };
 } // namespace conduit

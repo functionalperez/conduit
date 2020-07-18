@@ -16,6 +16,7 @@ struct future : helper<future<ReturnValue>, traits<true, true, false, true>> {
     void set_callback(std::coroutine_handle<> callback) noexcept { this->callback = callback; }
     void return_value(ReturnValue result) { this->result.emplace(std::move(result)); }
     void return_value(nothing_t) {}
-    optional_ref<ReturnValue> get_value() { return optional_ref(result); }
+    optional_ref<ReturnValue> get_value() & { return optional_ref(result); }
+    std::optional<ReturnValue> get_value() && { return std::move(result); }
 };
 } // namespace conduit::promise
