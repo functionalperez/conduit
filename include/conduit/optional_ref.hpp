@@ -2,6 +2,7 @@
 #include <concepts>
 #include <cstddef>
 #include <utility>
+#include <optional>
 
 namespace conduit {
 template <class T>
@@ -12,6 +13,7 @@ class optional_ref {
     optional_ref(optional_ref const&) = default;
     optional_ref(optional_ref&&) = default;
     constexpr optional_ref(T& value) : pointer(&value) {}
+    constexpr optional_ref(std::optional<T>& value) : pointer(value ? value.operator->() : nullptr) {}
     constexpr optional_ref(std::nullptr_t) : pointer(nullptr) {}
     constexpr T* operator->() const noexcept { return pointer; }
     constexpr T& operator*() const& noexcept { return *pointer; }
@@ -31,4 +33,6 @@ class optional_ref {
 };
 template<class T>
 optional_ref(T&) -> optional_ref<T>;
+template<class T>
+optional_ref(std::optional<T>&) -> optional_ref<T>;
 } // namespace conduit
