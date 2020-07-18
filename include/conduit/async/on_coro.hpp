@@ -20,7 +20,9 @@ class on_coro {
     // Returns promise().get_value()
     constexpr auto await_resume() const {
         owner.assign_no_destroy(handle);
-        return handle.promise().get_value();
+        if constexpr(value_producing_promise<Promise&>) {
+            return handle.promise().get_value();
+        }
     }
 };
 template <class Promise>
@@ -37,10 +39,12 @@ class on_coro<Promise, true> {
         handle.promise().set_callback(callback);
         return handle;
     }
-    // Returns std::move(promise()).get_value()
+    // Returns std::move(promise()).get_value() if get_value() exists
     constexpr auto await_resume() {
         owner.assign_no_destroy(handle);
-        return std::move(handle.promise()).get_value();
+        if constexpr(value_producing_promise<Promise&&>) {
+            return std::move(handle.promise()).get_value();
+        }
     }
 };
 template <class Promise>
