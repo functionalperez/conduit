@@ -1,6 +1,6 @@
 #pragma once
 #include <conduit/async/jump.hpp>
-#include <conduit/promise/promise_base.hpp>
+#include <conduit/promise/helper.hpp>
 
 namespace conduit::promise {
 template <class ReturnValue>

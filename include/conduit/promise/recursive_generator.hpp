@@ -1,6 +1,6 @@
 #pragma once
 #include <conduit/async/await_if.hpp>
-#include <conduit/promise/promise_base.hpp>
+#include <conduit/promise/helper.hpp>
 #include <conduit/unique_handle.hpp>
 
 namespace conduit::promise {

@@ -1,5 +1,5 @@
 #pragma once
-#include <conduit/promise/promise_base.hpp>
+#include <conduit/promise/helper.hpp>
 
 namespace conduit::promise {
 struct co_void : helper<co_void> {};
