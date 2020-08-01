@@ -30,11 +30,5 @@ concept can_co_return = coroutine_type<Coro>
     && requires(promise_t<Coro> promise, type t) {
     promise.return_value(t);
 };
-
-template <class Alloc>
-concept allocator = requires(Alloc a, size_t size, void* pointer) {
-    { a.alloc(size) } -> std::same_as<void*>;
-    { Alloc::dealloc(pointer, size) };
-};
 // clang-format on
 } // namespace conduit
