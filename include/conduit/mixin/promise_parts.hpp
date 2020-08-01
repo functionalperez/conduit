@@ -1,6 +1,7 @@
 #pragma once
 #include <conduit/async/immediate_value.hpp>
 #include <conduit/common.hpp>
+#include <conduit/concepts.hpp>
 
 namespace conduit::mixin {
 enum suspend : bool { always = true, never = false };
@@ -73,6 +74,21 @@ struct GetReturnObject<Promise, true> : GetReturnObject<Promise, false> {
     // If there's an allocation failure, returns a null coroutine handle
     static handle_type get_return_object_on_allocation_failure() noexcept {
         return nullptr;
+    }
+};
+
+template <conduit::allocator Alloc>
+struct NewAndDelete {
+    template <class... T>
+    static void* operator new(size_t size, Alloc& alloc, T&&...) {
+        return alloc.alloc(size);
+    }
+    template <class... T>
+    static void* operator new(size_t size, Alloc* alloc, T&&...) {
+        return alloc->alloc(size);
+    }
+    static void operator delete(void* pointer, size_t size) {
+        std::decay_t<Alloc>::dealloc(pointer, size);
     }
 };
 } // namespace conduit::mixin
