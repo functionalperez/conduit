@@ -1,38 +1,32 @@
+#include <array>
+#include <conduit/async/get_this_handle.hpp>
+#include <conduit/async/on_suspend.hpp>
 #include <conduit/co_void.hpp>
+#include <conduit/continuation.hpp>
+#include <conduit/future.hpp>
 #include <conduit/source.hpp>
 #include <conduit/task.hpp>
 #include <conduit/void_coro.hpp>
-#include <conduit/continuation.hpp>
-#include <conduit/async/suspend_and_destroy.hpp>
-#include <conduit/async/get_this_handle.hpp>
+#include <cstdlib>
 #include <iostream>
-
+#include <vector>
 using namespace conduit;
 
-source<int> bar() {
-    co_yield 10;
-    co_yield 20;
-    co_await async::suspend_and_destroy();
-    co_yield 30;
-}
-task simple_task() {
-    std::cout << "Doing task\n";
-    co_return;
+void_coro foo() {
+    // It is safe to resume or destroy the calling coroutine when using async::on_suspend
+    auto op = [](auto callback, auto nums) {
+        printf("Callback on %p\n", callback.address());
+        for(int i : nums) {
+            std::cout << i << '\n';
+        }
+        callback.destroy();
+    };
+    co_await async::on_suspend(op, std::vector{1, 2, 3, 4, 5});
+    puts("Done");
 }
 
-void_coro foo() {
-    auto sauce = bar();
-    while (auto value = co_await sauce) {
-        std::cout << *value << '\n';
-    }
-    std::cout << "No more values\n" << std::flush;
-    co_await simple_task();
-    std::cout << "Completed task\n";
-}
-void_coro tiny() {
-    co_return ;
-}
 int main() {
+    unique_handle<std::coroutine_handle<>> h{nullptr};
+
     foo();
-    std::cout << "Exiting main\n";
 }
