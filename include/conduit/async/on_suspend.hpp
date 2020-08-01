@@ -1,12 +1,13 @@
 #include <conduit/continuation.hpp>
 #include <conduit/fn/bind.hpp>
-
+#include <conduit/mixin/awaitable_parts.hpp>
 #include <utility>
 
 namespace conduit::async {
 
 template <class F, class Bind>
-class on_suspend {
+struct on_suspend : mixin::AwaitReady<false>, mixin::AwaitResume {
+   private:
     struct package {
         [[no_unique_address]] F func;
         [[no_unique_address]] Bind bind;
@@ -14,9 +15,7 @@ class on_suspend {
         void operator()() { bind(func, handle); }
     };
 
-    using allocator = mem::linda<package, noop_continuation_size>;
-
-    allocator alloc;
+    mem::linda<package, noop_continuation_size> alloc;
 
    public:
     template <class... Args>
@@ -28,12 +27,10 @@ class on_suspend {
               package{std::move(func),
                       fn::bind_last(std::forward<Args>(args)...)}} {}
 
-    constexpr bool await_ready() { return false; }
     std::coroutine_handle<> await_suspend(std::coroutine_handle<> caller) {
         alloc.callback.handle = caller;
         return noop_continuation(alloc);
     }
-    void await_resume() {}
 };
 
 template <class F, class... Args>
