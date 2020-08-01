@@ -2,10 +2,10 @@
 #include <conduit/promise/continuation.hpp>
 
 namespace conduit {
-template <class Promise>
-struct continuation : std::coroutine_handle<Promise> {
-    using promise_type = Promise;
-    using super = std::coroutine_handle<Promise>;
+template <mem::allocator Alloc>
+struct continuation : std::coroutine_handle<promise::continuation<Alloc>> {
+    using promise_type = promise::continuation<Alloc>;
+    using super = std::coroutine_handle<promise_type>;
 
 /*
 Clang requires that a return object has a constructor which allows it to be
@@ -20,13 +20,13 @@ compiler error in gcc
 #endif
 };
 
-template <conduit::allocator Alloc>
-continuation<promise::continuation<Alloc>> noop_continuation(Alloc* alloc) {
+template <mem::allocator Alloc>
+continuation<Alloc> noop_continuation(Alloc* alloc) {
     co_return;
 }
 
 template <class Alloc>
-continuation<promise::continuation<Alloc>> noop_continuation(Alloc& alloc) {
+continuation<Alloc> noop_continuation(Alloc& alloc) {
     co_return;
 }
 } // namespace conduit
