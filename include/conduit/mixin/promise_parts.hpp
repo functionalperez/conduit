@@ -1,7 +1,7 @@
 #pragma once
 #include <conduit/async/immediate_value.hpp>
 #include <conduit/common.hpp>
-#include <conduit/concepts.hpp>
+#include <conduit/mem/allocator.hpp>
 
 namespace conduit::mixin {
 enum suspend : bool { always = true, never = false };
@@ -77,7 +77,7 @@ struct GetReturnObject<Promise, true> : GetReturnObject<Promise, false> {
     }
 };
 
-template <conduit::allocator Alloc>
+template <mem::allocator Alloc>
 struct NewAndDelete {
     template <class... T>
     static void* operator new(size_t size, Alloc& alloc, T&&...) {
