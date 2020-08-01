@@ -1,5 +1,5 @@
 #pragma once
-#include <coroutine>
+#include <conduit/coroutine.hpp>
 
 namespace conduit::async {
 struct await_if {

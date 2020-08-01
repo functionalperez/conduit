@@ -1,4 +1,4 @@
-#include <coroutine>
+#include <conduit/coroutine.hpp>
 #include <iostream>
 
 // See: https://stackoverflow.com/questions/62825103/should-the-coroutine-result-object-ever-be-constructed-after-initial-suspend

@@ -1,5 +1,5 @@
 #pragma once
-#include <coroutine>
+#include <conduit/coroutine.hpp>
 #include <cstddef>
 
 namespace conduit {

@@ -16,7 +16,7 @@ g++-10 -std=c++20 -fcoroutines main.cpp
 
 Compiling this file will produce an internal compiler error. Here, g++-10 invokes the g++ compiler provided by this package. This file should contain the following code (code inside ticks):
 ```
-#include <coroutine>
+#include <conduit/coroutine.hpp>
 #include <exception>
 
 // Compiler version resulting in bug: gcc 10.0.1 20200411 (experimental) 
