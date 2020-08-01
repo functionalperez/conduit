@@ -1,3 +1,8 @@
+#pragma once
+#if __has_include(<coroutine>)
+#include <coroutine>
+#else
+
 // <coroutine> -*- C++ -*-
 
 // Copyright (C) 2019-2020 Free Software Foundation, Inc.
@@ -287,3 +292,5 @@ namespace std _GLIBCXX_VISIBILITY (default)
 #endif // C++14 (we are allowing use from at least this)
 
 #endif // _GLIBCXX_COROUTINE
+
+#endif
