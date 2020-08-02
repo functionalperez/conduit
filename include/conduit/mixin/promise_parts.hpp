@@ -96,7 +96,7 @@ struct NewAndDelete {
 
 struct PromiseWithCallback : InitialSuspend<true> {
     async::callback callback;
-    auto& final_suspend() noexcept { return callback; }
+    auto final_suspend() noexcept { return callback.release_jump(); }
     void set_callback(std::coroutine_handle<> handle) { callback = handle; }
 };
 } // namespace conduit::mixin
