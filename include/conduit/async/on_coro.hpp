@@ -2,8 +2,11 @@
 #include <conduit/unique_handle.hpp>
 
 namespace conduit::async {
-template <class Promise, bool assume_ownership = false>
-struct on_coro {
+template <class Promise, bool assume_ownership>
+struct on_coro;
+
+template<class Promise>
+struct on_coro<Promise, false> {
     unique_handle<Promise>& owner;
     std::coroutine_handle<Promise> handle = nullptr;
 
