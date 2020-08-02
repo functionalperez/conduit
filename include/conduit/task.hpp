@@ -1,8 +1,7 @@
 #pragma once
 #include <conduit/async/jump.hpp>
 #include <conduit/async/on_coro.hpp>
-#include <conduit/promise/helper.hpp>
-#include <conduit/temporary_handle.hpp>
+#include <conduit/mixin/promise_parts.hpp>
 
 namespace conduit {
 namespace promise {
@@ -16,12 +15,9 @@ struct task : unique_handle<promise::task> {
 };
 
 namespace promise {
-struct task : helper<task, traits<true, true, true, true>> {
-    using base = promise::helper<task, traits<true, true, true, true>>;
-    conduit::task get_return_object() { return conduit::task{*this}; }
-    auto final_suspend() noexcept { return async::jump{callback.release()}; }
-    temporary_handle callback = std::noop_coroutine();
-    void set_callback(std::coroutine_handle<> callback) noexcept { this->callback = callback; }
-};
+struct task : mixin::GetReturnObject<task>,
+              mixin::PromiseWithCallback,
+              mixin::UnhandledException<true>,
+              mixin::ReturnVoid {};
 } // namespace promise
 } // namespace conduit
