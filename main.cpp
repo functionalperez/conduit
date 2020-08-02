@@ -8,25 +8,22 @@
 #include <conduit/task.hpp>
 #include <conduit/void_coro.hpp>
 #include <cstdlib>
-#include <iostream>
+#include <cstdio>
 #include <vector>
 using namespace conduit;
 
-void_coro foo() {
-    // It is safe to resume or destroy the calling coroutine when using async::on_suspend
-    auto op = [](auto callback, auto nums) {
-        printf("Callback on %p\n", callback.address());
-        for(int i : nums) {
-            std::cout << i << '\n';
-        }
-        callback.destroy();
-    };
-    co_await async::on_suspend(op, std::vector{1, 2, 3, 4, 5});
-    puts("Done");
+source<int> nums(int min, int max, int inc) {
+    for(; min < max; min += inc) {
+        co_yield min;
+    }
+}
+void_coro do_stuff() {
+    auto source = nums(0, 1000000000, 1);
+    while(auto val = co_await source) {
+        
+    }
 }
 
 int main() {
-    unique_handle<std::coroutine_handle<>> h{nullptr};
-
-    foo();
+    do_stuff();
 }
