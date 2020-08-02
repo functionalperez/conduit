@@ -5,7 +5,10 @@
 
 namespace conduit {
 namespace promise {
-struct task;
+struct task : mixin::GetReturnObject<task>,
+              mixin::PromiseWithCallback,
+              mixin::UnhandledException<true>,
+              mixin::ReturnVoid {};
 } // namespace promise
 
 struct task : unique_handle<promise::task> {
@@ -13,11 +16,4 @@ struct task : unique_handle<promise::task> {
     auto operator co_await() & { return async::on_coro{*this}; }
     auto operator co_await() && { return async::on_coro{std::move(*this)}; }
 };
-
-namespace promise {
-struct task : mixin::GetReturnObject<task>,
-              mixin::PromiseWithCallback,
-              mixin::UnhandledException<true>,
-              mixin::ReturnVoid {};
-} // namespace promise
 } // namespace conduit
