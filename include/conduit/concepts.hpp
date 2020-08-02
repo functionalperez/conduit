@@ -21,7 +21,7 @@ concept value_producing_promise = requires(Promise p) {
 };
 
 template <class Coro>
-concept coroutine_type = requires(handle_t<Coro> handle) {
+concept coroutine_type = std::is_class_v<Coro> && requires(handle_t<Coro> handle) {
     { Coro(handle) };
 };
 
