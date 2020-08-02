@@ -1,7 +1,9 @@
 #pragma once
 #include <conduit/async/immediate_value.hpp>
+#include <conduit/async/callback.hpp>
 #include <conduit/common.hpp>
 #include <conduit/mem/allocator.hpp>
+#include <conduit/mixin/awaitable_parts.hpp>
 
 namespace conduit::mixin {
 enum suspend : bool { always = true, never = false };
@@ -90,5 +92,11 @@ struct NewAndDelete {
     static void operator delete(void* pointer, size_t size) {
         std::decay_t<Alloc>::dealloc(pointer, size);
     }
+};
+
+struct PromiseWithCallback : InitialSuspend<true> {
+    async::callback callback;
+    auto& final_suspend() noexcept { return callback; }
+    void set_callback(std::coroutine_handle<> handle) { callback = handle; }
 };
 } // namespace conduit::mixin
