@@ -7,23 +7,25 @@
 #include <conduit/source.hpp>
 #include <conduit/task.hpp>
 #include <conduit/void_coro.hpp>
-#include <cstdlib>
+#include <conduit/generator.hpp>
 #include <cstdio>
+#include <cstdlib>
 #include <vector>
 using namespace conduit;
 
-source<int> nums(int min, int max, int inc) {
-    for(; min < max; min += inc) {
+template <class Coro>
+Coro nums(int min, int inc) {
+    for (;; min += inc) {
         co_yield min;
     }
 }
-void_coro do_stuff() {
-    auto source = nums(0, 1000000000, 1);
-    while(auto val = co_await source) {
-        
+void do_stuff() {
+    auto source = nums<generator<int>>(0, 1);
+    for(int i : source) {
+        printf("%i\n", i);
+        if(i > 100) break;
     }
+    puts("Done");
 }
 
-int main() {
-    do_stuff();
-}
+int main() { do_stuff(); }
