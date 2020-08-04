@@ -139,6 +139,7 @@ struct unique_handle : private std::coroutine_handle<Promise> {
             super::destroy();
         }
     }
+    promise_type& operator*() noexcept { return super::promise(); }
     // Accesses the coroutine promise
     promise_type* operator->() noexcept { return &super::promise(); }
 };
@@ -150,7 +151,7 @@ auto begin(unique_handle<T>& p) {
     if constexpr (unique_handle<T>::suspends_initially) {
         p.resume();
     }
-    return coro_iterator{p.get()};
+    return coro_iterator(p.promise());
 }
 template <class T>
 auto end(unique_handle<T>&) {
