@@ -3,13 +3,14 @@
 namespace conduit {
 struct coro_sentinal {};
 
-constexpr auto deref_current_value = [](auto coroutine_handle) -> decltype(auto) {
-    return *coroutine_handle.promise().value;
+constexpr auto deref_current_value = [](auto coroutine_handle) noexcept -> decltype(auto) {
+    return coroutine_handle.promise().value();
 };
 using deref_current_value_t = decltype(deref_current_value);
 template <class handle, class deref_fn = deref_current_value_t, bool is_noexcept = true>
 struct coro_iterator {
     handle coro = nullptr;
+
     // Used to implement dereference
     [[no_unique_address]] deref_fn deref = {};
 
