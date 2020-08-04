@@ -23,7 +23,7 @@ struct nothing_t {
     using promise_type = std::noop_coroutine_promise;
     explicit nothing_t() = default;
 
-    template <coroutine_type coro>
+    template <co_result coro>
     operator coro() const {
         co_return nothing_t();
     }
