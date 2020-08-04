@@ -10,9 +10,9 @@ class callback : mixin::AwaitReady<false>, mixin::AwaitResume {
     std::coroutine_handle<> h = nullptr;
     static inline auto release(std::coroutine_handle<>& h) noexcept
         -> std::coroutine_handle<> {
-        auto copy = h;
+        auto hold = h;
         h = nullptr;
-        return copy;
+        return hold;
     }
 
    public:
@@ -22,28 +22,18 @@ class callback : mixin::AwaitReady<false>, mixin::AwaitResume {
     constexpr callback(std::coroutine_handle<> h) noexcept : h(h) {}
     callback(const callback&) = delete;
     callback(callback&& source) noexcept : h(release(source.h)) {}
-
-    [[nodiscard]] auto release() noexcept -> callback {
-        return callback(release(h));
-    }
     // Releases ownership of the coroutine and produces an async::jump
     // with that coroutine
-    [[nodiscard]] auto release_jump() noexcept -> jump {
-        return jump{h ? release(h) : std::noop_coroutine()};
+    [[nodiscard]] auto release() noexcept -> jump {
+        return jump{release(h)};
     }
-    auto operator=(callback source) noexcept -> callback& {
-        swap(source);
-        return *this;
+    void emplace(std::coroutine_handle<> handle) noexcept {
+        h = handle;
     }
-    auto operator=(std::nullptr_t) -> self& {
-        if (h) {
-            release(h).destroy();
-        }
-        return *this;
-    }
+
     ~callback() {
         if (h)
-            release(h).destroy();
+            h.destroy();
     }
     constexpr void swap(callback& other) noexcept {
         auto temp = other.h;

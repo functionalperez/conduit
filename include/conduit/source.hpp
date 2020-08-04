@@ -8,7 +8,6 @@ template <class T>
 struct source : unique_handle<promise::source<T>> {
     using base = unique_handle<promise::source<T>>;
     using base::base;
-    auto operator co_await() & { return async::on_coro{*this}; }
-    auto operator co_await() && { return async::on_coro{std::move(*this)}; }
+    auto& operator co_await() & { return base::promise(); }
 };
 } // namespace conduit

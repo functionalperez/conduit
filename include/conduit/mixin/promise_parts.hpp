@@ -1,6 +1,6 @@
 #pragma once
-#include <conduit/async/immediate_value.hpp>
 #include <conduit/async/callback.hpp>
+#include <conduit/async/immediate_value.hpp>
 #include <conduit/common.hpp>
 #include <conduit/mem/allocator.hpp>
 #include <conduit/mixin/awaitable_parts.hpp>
@@ -95,8 +95,10 @@ struct NewAndDelete {
 };
 
 struct PromiseWithCallback : InitialSuspend<true> {
+   protected:
     async::callback callback;
-    auto final_suspend() noexcept { return callback.release_jump(); }
-    void set_callback(std::coroutine_handle<> handle) { callback = handle; }
+
+   public:
+    auto final_suspend() noexcept { return callback.release(); }
 };
 } // namespace conduit::mixin
