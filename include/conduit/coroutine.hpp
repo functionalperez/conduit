@@ -1,6 +1,20 @@
-#pragma once
+#ifndef CONDUIT_COROUTINE_HPP_INCLUDED
+#define CONDUIT_COROUTINE_HPP_INCLUDED 1
+
 #if __has_include(<coroutine>)
 #include <coroutine>
+#elif __has_include(<experimental/coroutine>)
+namespace std _GLIBCXX_VISIBILITY (default)
+{
+  _GLIBCXX_BEGIN_NAMESPACE_VERSION
+  using std::experimental::coroutine_handle;
+  using std::experimental::coroutine_traits;
+  using std::experimental::noop_coroutine;
+  using std::experimental::noop_coroutine_handle;
+  using std::experimental::noop_coroutine_promise;
+  using std::experimental::suspend_always;
+  using std::experimental::suspend_never;
+}
 #else
 
 // <coroutine> -*- C++ -*-
@@ -30,9 +44,6 @@
 /** @file include/coroutine
  *  This is a Standard C++ Library header.
  */
-
-#ifndef _CONDUIT_COROUTINE_IMPL
-#define _CONDUIT_COROUTINE_IMPL 1
 
 // It is very likely that earlier versions would work, but they are untested.
 #if __cplusplus >= 201402L
@@ -291,6 +302,6 @@ namespace std _GLIBCXX_VISIBILITY (default)
 
 #endif // C++14 (we are allowing use from at least this)
 
-#endif // _GLIBCXX_COROUTINE
+#endif
 
 #endif
