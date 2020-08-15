@@ -10,7 +10,7 @@ enum suspend : bool { always = true, never = false };
 
 template <bool suspend>
 struct InitialSuspend {
-    constexpr auto initial_suspend() noexcept {
+    inline constexpr auto initial_suspend() noexcept {
         if constexpr (suspend) {
             return std::suspend_always{};
         } else {
@@ -20,7 +20,7 @@ struct InitialSuspend {
 };
 template <bool suspend>
 struct FinalSuspend {
-    constexpr auto final_suspend() noexcept {
+    inline constexpr auto final_suspend() noexcept {
         if constexpr (suspend) {
             return std::suspend_always{};
         } else {
@@ -29,7 +29,7 @@ struct FinalSuspend {
     }
 };
 struct ReturnVoid {
-    constexpr void return_void() noexcept {}
+    inline constexpr void return_void() noexcept {}
 };
 template <bool IsNoexcept = true>
 struct UnhandledException {
@@ -52,15 +52,15 @@ struct GetReturnObject<Promise, false> {
     // Allows you access to the promise object from within a coroutine via
     // auto& promise = co_yield get_promise;
     // await_ready() always returns true
-    auto yield_value(get_promise_t) noexcept {
+    inline auto yield_value(get_promise_t) noexcept {
         return async::immediate_value{static_cast<Promise*>(this)};
     }
 
-    auto yield_value(get_handle_t) noexcept {
+    inline auto yield_value(get_handle_t) noexcept {
         return async::immediate_value{get_handle()};
     }
 
-    handle_type get_handle() noexcept {
+    inline handle_type get_handle() noexcept {
         return handle_type::from_promise(static_cast<Promise&>(*this));
     }
 };
@@ -94,11 +94,25 @@ struct NewAndDelete {
     }
 };
 
-struct PromiseWithCallback : InitialSuspend<true> {
+class HasOwnerAndCallback : public mixin::InitialSuspend<true> {
    protected:
+    std::coroutine_handle<>* owner = nullptr;
     async::callback callback;
 
    public:
-    auto final_suspend() noexcept { return callback.release(); }
+    inline void set_owner(std::coroutine_handle<>* owner) noexcept {
+        this->owner = owner;
+    }
+    inline void set_callback(std::coroutine_handle<> handle) noexcept {
+        callback.emplace(handle);
+    }
+
+    inline auto final_suspend() { return callback.release(); }
+
+    ~HasOwnerAndCallback() noexcept {
+        if (owner) {
+            *owner = nullptr;
+        }
+    }
 };
 } // namespace conduit::mixin
