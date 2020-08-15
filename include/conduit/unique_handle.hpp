@@ -55,10 +55,10 @@ struct unique_handle : private std::coroutine_handle<Promise> {
         }
     }
     unique_handle(unique_handle const&) = delete;
-    unique_handle(unique_handle&& source) : super(source) {
+    unique_handle(unique_handle&& source) noexcept : super(source) {
         source.super::operator=(nullptr);
         if constexpr (is_return_object_aware) {
-            promise().set_return_object(nullptr);
+            promise().set_return_object(this);
         }
     }
 
