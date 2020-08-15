@@ -1,35 +1,31 @@
 #pragma once
+#include <conduit/mixin/awaitable_parts.hpp>
 #include <conduit/mixin/promise_parts.hpp>
 #include <conduit/optional_ref.hpp>
-#include <conduit/unique_handle.hpp>
 
 #include <optional>
 
 namespace conduit::promise {
 template <class ReturnValue>
-struct source : mixin::GetReturnObject<source<ReturnValue>>,
-                mixin::PromiseWithCallback,
+struct source : mixin::HasOwnerAndCallback,
+                mixin::GetReturnObject<source<ReturnValue>>,
                 mixin::UnhandledException<true> {
    private:
-    ReturnValue const* pointer;
+    ReturnValue const* pointer = nullptr;
 
    public:
-    async::jump yield_value(ReturnValue const& value) {
+    constexpr auto get_value() & noexcept { return optional_ref{pointer}; }
+    constexpr auto get_value() && noexcept -> std::optional<ReturnValue> {
+        if (pointer) {
+            return std::optional<ReturnValue>{*pointer};
+        } else {
+            return std::nullopt;
+        }
+    }
+    constexpr auto yield_value(ReturnValue const& value) noexcept {
         pointer = &value;
         return callback.release();
     }
-    void return_void() { pointer = nullptr; }
-
-    constexpr bool await_ready() noexcept { return false; }
-    auto await_suspend(std::coroutine_handle<> handle) noexcept
-        -> std::coroutine_handle<> {
-        callback.emplace(handle);
-        return std::coroutine_handle<source>::from_promise(*this);
-    }
-    constexpr optional_ref<ReturnValue const> await_resume() noexcept {
-        return optional_ref{pointer};
-    }
-    // optional_ref<ReturnValue const> get_value() & { return
-    // optional_ref(pointer); }
+    constexpr void return_void() noexcept { pointer = nullptr; }
 };
 } // namespace conduit::promise

@@ -1,15 +1,11 @@
 #pragma once
-#include <conduit/async/on_coro.hpp>
+#include <conduit/async/coro.hpp>
 #include <conduit/promise/future.hpp>
-#include <conduit/unique_handle.hpp>
 
 namespace conduit {
-template <class T>
-struct future : unique_handle<promise::future<T>> {
-    using super = unique_handle<promise::future<T>>;
-    using super::super;
+template<class T>
+using future = async::coro<promise::future<T>>;
 
-    auto operator co_await() & { return async::on_coro{*this}; }
-    auto operator co_await() && { return async::on_coro{std::move(*this)}; }
-};
+template<class T>
+using optional_future = async::coro<promise::optional_future<T>>;
 } // namespace conduit

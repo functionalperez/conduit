@@ -58,5 +58,8 @@ concept can_co_return = co_result<Result>
     && requires(promise_t<Result> p, Value v) {
     { p.return_value(v) } -> std::same_as<void>;
 };
+
+template<class Promise>
+concept awaitable_promise = awaitable<Promise> && co_promise<Promise>;
 // clang-format on
 } // namespace conduit
