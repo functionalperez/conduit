@@ -1,5 +1,5 @@
 #pragma once
-#include <concepts>
+#include <conduit/concepts.hpp>
 #include <cstddef>
 #include <cstdio>
 
@@ -7,7 +7,7 @@ namespace conduit::mem {
 // clang-format off
 template <class Alloc>
 concept allocator = requires(Alloc a, size_t size, void* pointer) {
-    { a.alloc(size) } -> std::same_as<void*>;
+    { a.alloc(size) } -> same_as<void*>;
     { Alloc::dealloc(pointer, size) };
 };
 // clang-format on
