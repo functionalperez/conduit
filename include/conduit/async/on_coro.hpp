@@ -1,24 +1,24 @@
 #pragma once
-#include <conduit/unique_handle.hpp>
+#include <conduit/coroutine.hpp>
+#include <conduit/concepts.hpp>
+#include <utility>
 
 namespace conduit::async {
-template <class Promise, bool move_value = false>
+template <co_promise P, bool move_value = false>
 struct on_coro {
-    std::coroutine_handle<Promise> handle;
+    std::coroutine_handle<P> handle;
 
-    constexpr bool await_ready() noexcept {
-        return false;
-    }
+    constexpr bool await_ready() noexcept { return false; }
     std::coroutine_handle<> await_suspend(std::coroutine_handle<> awaiter) {
         handle.promise().set_callback(awaiter);
         return handle;
     }
-    auto await_resume() {
-        if constexpr(move_value) {
-            return std::move(handle.promise()).get_value();
-        } else {
-            return handle.promise().get_value();
-        }
+    bool await_resume() noexcept { return !handle.done(); }
+    auto await_resume() requires(value_producing_promise<P> && !move_value) {
+        return handle.promise().get_value();
+    }
+    auto await_resume() requires(value_producing_promise<P> && move_value) {
+        return std::move(handle.promise()).get_value();
     }
 };
 
