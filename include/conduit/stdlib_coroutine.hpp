@@ -2,6 +2,14 @@
 
 #if __has_include(<coroutine>)
 #include <coroutine>
+
+#ifdef __clang__
+namespace std::experimental {
+using std::coroutine_handle;
+using std::coroutine_traits;
+} // namespace std::experimental
+#endif
+
 #elif __has_include(<experimental/coroutine>)
 #include <experimental/coroutine>
 namespace std

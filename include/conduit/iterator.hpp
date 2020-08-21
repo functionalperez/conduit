@@ -1,5 +1,5 @@
 #pragma once
-#include <conduit/common.hpp>
+#include <conduit/stdlib_coroutine.hpp>
 
 namespace conduit {
 struct coro_sentinal {};
