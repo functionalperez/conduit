@@ -28,4 +28,14 @@ struct source : mixin::HasOwnerAndCallback,
     }
     constexpr void return_void() noexcept { pointer = nullptr; }
 };
+template <>
+struct source<void> : mixin::HasOwnerAndCallback,
+                      mixin::GetReturnObject<source<void>>,
+                      mixin::UnhandledException<true>,
+                      mixin::ReturnVoid {
+   public:
+    auto yield_value(nothing_t) noexcept {
+        return callback.release();
+    }
+};
 } // namespace conduit::promise
