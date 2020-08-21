@@ -1,5 +1,5 @@
 #pragma once
-#include <conduit/coroutine.hpp>
+#include <conduit/stdlib_coroutine.hpp>
 
 namespace conduit::async {
 class get_this_handle {
