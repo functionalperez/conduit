@@ -4,8 +4,10 @@
 #include <type_traits>
 
 namespace conduit {
+// clang-format off
 template <class A, class B>
 concept same_as = std::is_same_v<A, B> && std::is_same_v<B, A>;
+
 template <class From, class To>
 concept convertible_to = std::is_convertible_v<From, To> 
     && requires(std::add_rvalue_reference_t<From> (&f)()) {
@@ -21,7 +23,7 @@ using promise_t = typename std::coroutine_traits<T, Args...>::promise_type;
 template <class T>
 using handle_t = std::coroutine_handle<promise_t<T>>;
 
-// clang-format off
+
 template<class T, class... Alt>
 concept same_as_either = (same_as<T, Alt> || ...);
 
