@@ -43,13 +43,21 @@ class coro {
         if (other.handle)
             handle.promise().set_owner(&other.handle);
     }
-
+    
+    // awaits on the given coroutine
     auto operator co_await() & noexcept {
         return on_coro<Promise, false>{handle};
     }
+    
+    #if defined(__GNUC__) && !defined(__clang__)
+    // co_awaiting directly on a newly created coroutine causes a memory leak in gcc
+    auto operator co_await() && noexcept = delete;
+    #else 
+    // awaits on the given coroutine
     auto operator co_await() && noexcept {
         return on_coro<Promise, true>{handle};
     }
+    #endif
     bool done() const { return handle.done(); }
 
     ~coro() {
