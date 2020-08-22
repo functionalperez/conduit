@@ -1,6 +1,6 @@
 #pragma once
-#include <conduit/util/stdlib_coroutine.hpp>
 #include <conduit/util/concepts.hpp>
+#include <conduit/util/stdlib_coroutine.hpp>
 #include <utility>
 
 namespace conduit::async {
@@ -17,7 +17,7 @@ struct on_coro {
     auto await_resume() requires(value_producing_promise<P> && !move_value) {
         return handle.promise().get_value();
     }
-    auto await_resume() requires(value_producing_promise<P> && move_value) {
+    auto await_resume() requires(value_producing_promise<P>&& move_value) {
         return std::move(handle.promise()).get_value();
     }
 };

@@ -24,10 +24,7 @@ class callback : mixin::AwaitReady<false>, mixin::AwaitResume {
     callback(callback&& source) noexcept : h(release(source.h)) {}
     // Releases ownership of the coroutine and produces an async::jump
     // with that coroutine
-    [[nodiscard]] // async::jump should not be discarded 
-    auto release() noexcept -> jump {
-        return jump{release(h)};
-    }
+    [[nodiscard]] auto release() noexcept -> jump { return jump{release(h)}; }
     constexpr void emplace(std::coroutine_handle<> handle) noexcept {
         h = handle;
     }

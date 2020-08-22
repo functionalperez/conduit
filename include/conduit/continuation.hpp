@@ -12,7 +12,6 @@ struct continuation : mixin::GetReturnObject<continuation<Alloc>, false>,
                       mixin::NewAndDelete<Alloc> {};
 } // namespace conduit::promise
 
-
 namespace conduit {
 template <mem::allocator Alloc>
 struct continuation : std::coroutine_handle<promise::continuation<Alloc>> {

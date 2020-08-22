@@ -30,11 +30,10 @@ struct optional_future : mixin::GetReturnObject<optional_future<ReturnValue>>,
 };
 } // namespace conduit::promise
 
-
 namespace conduit {
-template<class T>
+template <class T>
 using future = async::coro<promise::future<T>>;
 
-template<class T>
+template <class T>
 using optional_future = async::coro<promise::optional_future<T>>;
 } // namespace conduit

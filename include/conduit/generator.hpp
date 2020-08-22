@@ -1,6 +1,6 @@
 #pragma once
-#include <conduit/util/iterator.hpp>
 #include <conduit/mixin/promise_parts.hpp>
+#include <conduit/util/iterator.hpp>
 #include <conduit/util/unique_handle.hpp>
 
 namespace conduit::promise {
