@@ -1,25 +1,27 @@
 #pragma once
+#include <conduit/iterator.hpp>
 #include <conduit/promise/generator.hpp>
 #include <conduit/unique_handle.hpp>
 
 namespace conduit {
-template <class T, bool is_noexcept = true, bool generator_mode = check_first>
-using generator = unique_handle<promise::generator<T, is_noexcept, generator_mode>>;
+template <class T>
+using generator = unique_handle<promise::generator<T>>;
 
-template <class T, bool is_noexcept>
-bool operator>>(generator<T, is_noexcept, check_first>& g, T& value) noexcept(is_noexcept) {
-    if (g.done())
-        return false;
-    value = g->value;
-    g.resume();
-    return true;
+template<class T>
+auto begin(generator<T>& g) -> coro_iterator<std::coroutine_handle<promise::generator<T>>> {
+    return {g.get()};
 }
-template <class T, bool is_noexcept>
-bool operator>>(generator<T, is_noexcept, resume_first>& g, T& value) noexcept(is_noexcept) {
-    g.resume();
+template<class T>
+auto end(generator<T>& g) -> coro_iterator<std::coroutine_handle<promise::generator<T>>> {
+    return {g.get()};
+}
+
+template <class T>
+bool operator>>(generator<T>& g, T& value) {
     if (g.done())
         return false;
     value = g->value;
+    g.resume();
     return true;
 }
 } // namespace conduit

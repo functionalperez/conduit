@@ -3,17 +3,11 @@
 
 namespace conduit::promise {
 
-template <
-    // Type output by generator
-    class T,
-    // Should funcitons be noexcept
-    bool IsNoexcept,
-    // Should the coroutine always suspend initially
-    bool Suspend>
-struct generator : mixin::GetReturnObject<generator<T, IsNoexcept, Suspend>>,
-                   mixin::InitialSuspend<Suspend>,
-                   mixin::FinalSuspend<mixin::suspend::always>,
-                   mixin::UnhandledException<IsNoexcept>,
+template <class T>
+struct generator : mixin::GetReturnObject<generator<T>>,
+                   mixin::InitialSuspend<false>,
+                   mixin::FinalSuspend<true>,
+                   mixin::UnhandledException<>,
                    mixin::ReturnVoid {
    private:
     // yielded value stored here

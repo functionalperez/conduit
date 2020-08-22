@@ -1,7 +1,8 @@
 #pragma once
 #include <conduit/async/await_if.hpp>
-#include <conduit/promise/helper.hpp>
+#include <conduit/mixin/promise_parts.hpp>
 #include <conduit/unique_handle.hpp>
+#include <conduit/iterator.hpp>
 
 namespace conduit::promise {
 template <
@@ -12,16 +13,13 @@ struct recursive_generator;
 template <
     // Type output by generator
     class T>
-struct recursive_generator : helper<recursive_generator<T>, no_return_void> {
-
-    using super = helper<recursive_generator, no_return_void>;
+struct recursive_generator : mixin::InitialSuspend<false>, mixin::UnhandledException<> {
     using return_object = unique_handle<recursive_generator>;
-
-   public:
+    using handle_type = std::coroutine_handle<recursive_generator>;
     return_object* sauce = nullptr;
+    T const* pointer = nullptr;
 
    public:
-    using super::yield_value;
 
     /* --- IMPORTANT --- */
     /*
@@ -36,7 +34,7 @@ struct recursive_generator : helper<recursive_generator<T>, no_return_void> {
         The workaround is to explicitly create a get_return_object that returns a unique_handle
         in classes for which the ordering of initial_suspend and get_return_object is important.
     */
-    auto get_return_object() { return return_object{super::get_handle()}; }
+    auto get_return_object() { return return_object{handle_type::from_promise(*this)}; }
     void set_return_object(return_object* sauce) { this->sauce = sauce; }
 
     void return_value(return_object new_generator) {
@@ -44,29 +42,33 @@ struct recursive_generator : helper<recursive_generator<T>, no_return_void> {
     }
     void return_value(nothing_t) {}
 
-    async::await_if final_suspend() noexcept {
+    async::continue_if final_suspend() noexcept {
         // If the sauce is null, this coroutine has been coroutine
         // so await_ready should indicate true in order to clean up coroutine
-        return async::await_if{sauce == nullptr};
+        return async::continue_if{sauce == nullptr};
     }
-    // yielded value stored here
-    T value;
 
     // Stores value in this->value, to be accessed by the caller via
     // coroutine_handle.promise().value
-    constexpr auto yield_value(T value) noexcept(move_T_noexcept) {
-        this->value = std::move(value);
+    constexpr auto yield_value(T const& v) noexcept {
+        pointer = &v;
         return std::suspend_always{};
     }
-
-   private:
-    // These are just used to get a reference to T in template expressions
-    static T& mutable_T();
-    static T&& moved_T();
-    constexpr static bool move_T_noexcept = noexcept(mutable_T() = moved_T());
+    constexpr T const& value() noexcept {
+        return *pointer;
+    }
 };
 } // namespace conduit::promise
 namespace conduit {
 template <class T>
 using recursive_generator = unique_handle<promise::recursive_generator<T>>;
+
+template<class T>
+auto begin(recursive_generator<T>& g) -> coro_iterator<recursive_generator<T>&> {
+    return {g};
+}
+template<class T>
+auto end(recursive_generator<T>& g) -> coro_iterator<recursive_generator<T>&> {
+    return {g};
+}
 }
