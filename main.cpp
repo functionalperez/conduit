@@ -49,13 +49,22 @@ future<std::string> test_generator(std::string on_success) {
     co_return std::string(begin(g), end(g));
 }
 
+struct destroy_on_resume : mixin::Resumable<destroy_on_resume> {
+    std::coroutine_handle<> caller;
+    void set_caller(auto c) { caller = c; }
+    void resume() {
+        caller.destroy();
+    }
+};
 future<std::string> test_on_suspend(std::string on_success) {
     std::string result;
-    auto f = [&](std::coroutine_handle<> h, std::string& r) {
-        r = on_success;
+    std::cerr << "result: " << (void*)&result << " / success: " << (void*)&on_success << '\n';
+    auto f = [](std::coroutine_handle<> h, std::string& result, std::string& on_success) {
+        std::cerr << "result: " << (void*)&result << " / success: " << (void*)&on_success << '\n';
+        result = on_success;
         h.resume();
     };
-    co_await async::on_suspend(f, fn::bind_last(result));
+    co_await async::make_on_suspend(f, result, on_success);
     co_return result;
 }
 
@@ -72,7 +81,6 @@ future<std::string> test_recursive_generator(std::string on_success) {
     auto g = example_recursive_generator(on_success);
     co_return std::string(begin(g), end(g));
 }
-
 
 future<std::string> test_source(std::string on_success) {
     auto coro = [&]() -> source<char> {

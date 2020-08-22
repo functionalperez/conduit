@@ -23,17 +23,17 @@ arg(T &&) -> arg<T>;
 template <class T>
 arg(T&) -> arg<T&>;
 
-template <class... T>
-auto bind_last(T&&... last) {
-    return
-        [... last_ = arg{forward<T>(last)}](auto&& f, auto&&... first) mutable {
-            return f(forward<decltype(first)>(first)..., last_.fwd()...);
-        };
+template <class F, class... T>
+auto bind_last(F&& func, T&&... last) {
+    return [f = forward<F>(func),
+            ... last_ = arg{forward<T>(last)}](auto&&... first) mutable {
+        return f(forward<decltype(first)>(first)..., last_.fwd()...);
+    };
 }
-template <class... T>
-auto bind_first(T&&... first) {
-    return [... first_ = arg{forward<T>(first)}](auto&& f,
-                                                 auto&&... last) mutable {
+template <class F, class... T>
+auto bind_first(F&& func, T&&... first) {
+    return [f = forward<F>(func),
+            ... first_ = arg{forward<T>(first)}](auto&&... last) mutable {
         return f(first_.fwd()..., forward<decltype(last)>(last)...);
     };
 }

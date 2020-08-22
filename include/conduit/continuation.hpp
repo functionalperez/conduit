@@ -13,7 +13,7 @@ struct continuation : mixin::GetReturnObject<continuation<Alloc>, false>,
 } // namespace conduit::promise
 
 namespace conduit {
-template <mem::allocator Alloc>
+template <class Alloc>
 struct continuation : std::coroutine_handle<promise::continuation<Alloc>> {
     using promise_type = promise::continuation<Alloc>;
     using super = std::coroutine_handle<promise_type>;
@@ -31,7 +31,7 @@ compiler error in gcc
 #endif
 };
 
-template <mem::allocator Alloc>
+template <class Alloc>
 continuation<Alloc> noop_continuation(Alloc* alloc) {
     co_return;
 }
