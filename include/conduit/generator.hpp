@@ -15,7 +15,7 @@ struct generator : mixin::GetReturnObject<generator<T>>,
     T const* pointer;
 
    public:
-    constexpr T const& value() const noexcept { return *pointer; }
+    constexpr T const& get_value() const noexcept { return *pointer; }
     // Stores value in this->value, to be accessed by the caller via
     // coroutine_handle.promise().value
     constexpr auto yield_value(T const& v) noexcept {

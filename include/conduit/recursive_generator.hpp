@@ -43,7 +43,7 @@ struct recursive_generator : mixin::InitialSuspend<false>,
         pointer = &v;
         return std::suspend_always{};
     }
-    constexpr T const& value() noexcept { return *pointer; }
+    constexpr T const& get_value() noexcept { return *pointer; }
 };
 } // namespace conduit::promise
 

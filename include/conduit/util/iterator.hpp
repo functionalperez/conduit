@@ -16,7 +16,7 @@ struct coro_iterator {
 
     // Calls deref on the coroutine handle and returns the result
     // By default, this returns coro.promise().current_value;
-    decltype(auto) operator*() noexcept { return coro.promise().value(); }
+    decltype(auto) operator*() noexcept { return coro.promise().get_value(); }
 
     // Returns true iff the coroutine is done
     bool operator==(coro_sentinal) const noexcept { return coro.done(); }
@@ -29,7 +29,7 @@ struct coro_iterator {
 
     using iterator_category = std::input_iterator_tag;
     using value_type =
-        std::remove_reference_t<decltype(coro.promise().value())>;
+        std::remove_reference_t<decltype(coro.promise().get_value())>;
     using pointer = value_type const*;
     using reference = value_type const&;
     using difference_type = std::ptrdiff_t;
