@@ -1,6 +1,6 @@
 #pragma once
-#include <conduit/stdlib_coroutine.hpp>
-#include <conduit/concepts.hpp>
+#include <conduit/util/stdlib_coroutine.hpp>
+#include <conduit/util/concepts.hpp>
 #include <utility>
 
 namespace conduit::async {

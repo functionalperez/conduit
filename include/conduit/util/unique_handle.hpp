@@ -1,7 +1,7 @@
 #pragma once
-#include <conduit/iterator.hpp>
-#include <conduit/concepts.hpp>
-#include <conduit/stdlib_coroutine.hpp>
+#include <conduit/util/iterator.hpp>
+#include <conduit/util/concepts.hpp>
+#include <conduit/util/stdlib_coroutine.hpp>
 
 #include <utility>
 

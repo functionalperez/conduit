@@ -1,8 +1,8 @@
 #pragma once
 #include <conduit/async/await_if.hpp>
-#include <conduit/iterator.hpp>
+#include <conduit/util/iterator.hpp>
 #include <conduit/mixin/promise_parts.hpp>
-#include <conduit/unique_handle.hpp>
+#include <conduit/util/unique_handle.hpp>
 
 namespace conduit::promise {
 template <

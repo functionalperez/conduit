@@ -1,5 +1,5 @@
 #pragma once
-#include <conduit/stdlib_coroutine.hpp>
+#include <conduit/util/stdlib_coroutine.hpp>
 
 namespace conduit::mixin {
 template <bool ready>

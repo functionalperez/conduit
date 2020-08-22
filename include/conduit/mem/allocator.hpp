@@ -1,5 +1,5 @@
 #pragma once
-#include <conduit/concepts.hpp>
+#include <conduit/util/concepts.hpp>
 #include <cstddef>
 
 namespace conduit::mem {
