@@ -4,6 +4,7 @@
 #include <conduit/recursive_generator.hpp>
 #include <conduit/source.hpp>
 #include <conduit/task.hpp>
+#include <conduit/async/on_suspend.hpp>
 #include <cstdio>
 #include <cstdlib>
 #include <iostream>
@@ -87,6 +88,16 @@ future<std::string> test_recursive_generator(std::string on_success) {
     auto g = example_recursive_generator(on_success);
     co_return std::string(begin(g), end(g));
 }
+
+future<std::string> test_on_suspend(std::string on_success) {
+    std::string result;
+    auto f = [&](std::coroutine_handle<> h, std::string& r) {
+        r = on_success;
+        h.resume();
+    };
+    co_await async::on_suspend(f, fn::bind_last(result));
+    co_return result;
+}
 coroutine run_tests() {
     RUN_TEST(test_coroutine);
     RUN_TEST(test_future);
@@ -94,7 +105,9 @@ coroutine run_tests() {
     RUN_TEST(test_task);
     RUN_TEST(test_generator);
     RUN_TEST(test_recursive_generator);
+    RUN_TEST(test_on_suspend);
 }
+
 
 int main() {
     run_tests();
