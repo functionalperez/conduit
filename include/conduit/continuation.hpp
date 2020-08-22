@@ -3,7 +3,7 @@
 #include <conduit/mixin/promise_parts.hpp>
 
 namespace conduit::promise {
-template <mem::allocator Alloc>
+template <class Alloc>
 struct continuation : mixin::GetReturnObject<continuation<Alloc>, false>,
                       mixin::UnhandledException<true>,
                       mixin::InitialSuspend<mixin::always>,

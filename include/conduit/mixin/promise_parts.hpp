@@ -80,7 +80,7 @@ struct GetReturnObject<Promise, true> : GetReturnObject<Promise, false> {
     }
 };
 
-template <mem::allocator Alloc>
+template <class Alloc>
 struct NewAndDelete {
     template <class... T>
     static void* operator new(size_t size, Alloc& alloc, T&&...) {

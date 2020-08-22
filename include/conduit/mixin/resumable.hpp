@@ -8,7 +8,6 @@ class Resumable {
     alignas(void*) mutable char buffer[buffer_size]{};
     continuation<Resumable> run() { co_return; }
 
-   public:
     void* alloc(size_t size) {
         if (size <= buffer_size) {
             return buffer;
@@ -31,8 +30,9 @@ class Resumable {
             static_cast<Derived*>(pointer_to_allocator)->resume();
         }
     }
-    // friend class mixin::NewAndDelete<Resumable>;
+    friend class mixin::NewAndDelete<Resumable>;
 
+   public:
     constexpr bool await_ready() noexcept { return false; }
     std::coroutine_handle<> await_suspend(std::coroutine_handle<> caller) {
         static_cast<Derived*>(this)->set_caller(caller);
