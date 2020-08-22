@@ -75,9 +75,7 @@ future<std::string> test_generator(std::string on_success) {
 
 future<std::string> test_on_suspend(std::string on_success) {
     std::string result;
-    std::cerr << "result: " << (void*)&result << " / success: " << (void*)&on_success << '\n';
     auto f = [](std::coroutine_handle<> h, std::string& result, std::string& on_success) {
-        std::cerr << "result: " << (void*)&result << " / success: " << (void*)&on_success << '\n';
         result = on_success;
         h.resume();
     };
