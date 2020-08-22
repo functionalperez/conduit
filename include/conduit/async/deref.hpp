@@ -1,5 +1,5 @@
 #pragma once
-#include <conduit/common.hpp>
+#include <conduit/util/stdlib_coroutine.hpp>
 
 namespace conduit::async {
 template <class T>
