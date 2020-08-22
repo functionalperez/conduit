@@ -1,7 +1,7 @@
 #include <conduit/coroutine.hpp>
 #include <conduit/future.hpp>
 #include <conduit/generator.hpp>
-#include <conduit/promise/recursive_generator.hpp>
+#include <conduit/recursive_generator.hpp>
 #include <conduit/source.hpp>
 #include <conduit/task.hpp>
 #include <cstdio>
