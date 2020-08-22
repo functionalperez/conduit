@@ -1,7 +1,7 @@
 #include <conduit/future.hpp>
 #include <conduit/source.hpp>
 #include <conduit/task.hpp>
-#include <conduit/void_coro.hpp>
+#include <conduit/coroutine.hpp>
 #include <cstdio>
 #include <cstdlib>
 #include <iostream>
@@ -12,8 +12,8 @@ using namespace conduit;
 #define RUN_TEST(test)                                                         \
     std::cout << "Running " #test "...\t" << co_await test(#test " succeeded") << std::endl;
 
-future<std::string> test_void_coro(std::string on_success) {
-    auto coro = [=](std::string& result) -> void_coro {
+future<std::string> test_coroutine(std::string on_success) {
+    auto coro = [=](std::string& result) -> coroutine {
         result = on_success;
         co_return;
     };
@@ -50,8 +50,8 @@ future<std::string> test_task(std::string on_success) {
     co_await coro(result);
     co_return result;
 }
-void_coro run_tests() {
-    RUN_TEST(test_void_coro);
+coroutine run_tests() {
+    RUN_TEST(test_coroutine);
     RUN_TEST(test_future);
     RUN_TEST(test_source);
     RUN_TEST(test_task);
