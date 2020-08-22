@@ -1,7 +1,7 @@
 #pragma once
 #include <conduit/async/await_if.hpp>
-#include <conduit/util/iterator.hpp>
 #include <conduit/mixin/promise_parts.hpp>
+#include <conduit/util/iterator.hpp>
 #include <conduit/util/unique_handle.hpp>
 
 namespace conduit::promise {
@@ -21,20 +21,6 @@ struct recursive_generator : mixin::InitialSuspend<false>,
     T const* pointer = nullptr;
 
    public:
-    /* --- IMPORTANT --- */
-    /*
-        I believe that there is a bug in gcc where the compiler will construct
-        the return object *after* the call to initial_suspend if
-       get_return_object doesn't directly return the return object.
-
-        In other words, if get_return_object returns a handle,
-        then the compiler will construct unique_handle *after* the coroutine
-        finally suspends. This results in a segfault in some cases.
-
-        The workaround is to explicitly create a get_return_object that returns
-       a unique_handle in classes for which the ordering of initial_suspend and
-       get_return_object is important.
-    */
     auto get_return_object() {
         return return_object{handle_type::from_promise(*this)};
     }
