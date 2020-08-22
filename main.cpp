@@ -5,6 +5,7 @@
 #include <conduit/recursive_generator.hpp>
 #include <conduit/source.hpp>
 #include <conduit/task.hpp>
+#include <conduit/async/destroy.hpp>
 #include <cstdio>
 #include <cstdlib>
 #include <iostream>
@@ -33,6 +34,28 @@ future<std::string> test_coroutine(std::string on_success) {
     co_return result;
 }
 
+task inner_task(std::string& result, std::string const& on_success, std::string const& on_failure) {
+    result = on_success;
+    co_await async::destroy();
+    result = on_failure;
+}
+task outer_task(std::string& result, std::string const& on_success, std::string const& on_failure) {
+    task t = inner_task(result, on_success, on_failure);
+    co_await t;
+    result = on_failure;
+}
+future<std::string> test_destroy(std::string on_success) {
+    auto coro = [](std::string& result, std::string const& on_success, std::string const& on_failure) -> coroutine {
+        auto t = outer_task(result, on_success, on_failure);
+        co_await t;
+        result = on_failure;
+    };
+    std::string result;
+    coro(result, on_success, "async::destroy failed to destroy");
+
+    co_return result;
+}
+
 future<std::string> test_future(std::string on_success) {
     co_return on_success;
 }
@@ -49,13 +72,7 @@ future<std::string> test_generator(std::string on_success) {
     co_return std::string(begin(g), end(g));
 }
 
-struct destroy_on_resume : mixin::Resumable<destroy_on_resume> {
-    std::coroutine_handle<> caller;
-    void set_caller(auto c) { caller = c; }
-    void resume() {
-        caller.destroy();
-    }
-};
+
 future<std::string> test_on_suspend(std::string on_success) {
     std::string result;
     std::cerr << "result: " << (void*)&result << " / success: " << (void*)&on_success << '\n';
@@ -112,6 +129,7 @@ future<std::string> test_task(std::string on_success) {
 
 coroutine run_tests() {
     RUN_TEST(test_coroutine);
+    RUN_TEST(test_destroy);
     RUN_TEST(test_future);
     RUN_TEST(test_generator);
     RUN_TEST(test_on_suspend);
