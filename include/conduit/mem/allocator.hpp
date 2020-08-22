@@ -1,7 +1,6 @@
 #pragma once
 #include <conduit/concepts.hpp>
 #include <cstddef>
-#include <cstdio>
 
 namespace conduit::mem {
 // clang-format off
@@ -53,11 +52,9 @@ struct static_callback_allocator {
     }
     static void dealloc(void* addr, size_t size) {
         if (size <= sizeof(buffer)) {
-            puts("Deallocating static");
             self* pointer_to_allocator = (self*)addr;
             pointer_to_allocator->callback();
         } else {
-            puts("Deallocating dynamic");
             constexpr size_t offset = sizeof(self*);
             self* pointer_to_allocator = *(self**)((char*)addr - offset);
             delete[]((char*)addr - offset);
