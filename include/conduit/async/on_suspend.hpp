@@ -4,8 +4,13 @@
 #include <utility>
 
 namespace conduit::async {
+template <class Bind, class F>
+concept on_suspend_bind = requires(Bind bind, F func,
+                                   std::coroutine_handle<> h) {
+    {bind(func, h)};
+};
 
-template <class F, class Bind>
+template <class F, on_suspend_bind<F> Bind>
 struct on_suspend : mixin::AwaitReady<false>, mixin::AwaitResume {
    private:
     struct package {
@@ -18,14 +23,10 @@ struct on_suspend : mixin::AwaitReady<false>, mixin::AwaitResume {
     mem::linda<package, noop_continuation_size> alloc;
 
    public:
-    template <class... Args>
-    on_suspend(F const& func, Args&&... args)
-      : alloc{{}, package{func, fn::bind_last(std::forward<Args>(args)...)}} {}
-    template <class... Args>
-    on_suspend(F&& func, Args&&... args)
-      : alloc{{},
-              package{std::move(func),
-                      fn::bind_last(std::forward<Args>(args)...)}} {}
+    on_suspend(F const& func, Bind&& b)
+      : alloc{{}, package{func, std::move(b)}} {}
+    on_suspend(F&& func, Bind&& b)
+      : alloc{{}, package{std::move(func), std::move(b)}} {}
 
     std::coroutine_handle<> await_suspend(std::coroutine_handle<> caller) {
         alloc.callback.handle = caller;
@@ -33,7 +34,6 @@ struct on_suspend : mixin::AwaitReady<false>, mixin::AwaitResume {
     }
 };
 
-template <class F, class... Args>
-on_suspend(F, Args... args) -> on_suspend<F, fn::bind_last_t<Args...>>;
-
+template <class F, on_suspend_bind<F> Bind>
+on_suspend(F, Bind bind) -> on_suspend<F, Bind>;
 } // namespace conduit::async
