@@ -1,3 +1,4 @@
+#pragma once
 #include <conduit/continuation.hpp>
 #include <conduit/fn/bind.hpp>
 #include <conduit/mixin/awaitable_parts.hpp>
