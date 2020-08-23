@@ -5,6 +5,9 @@
 namespace conduit::mixin {
 template <class Derived>
 class Resumable {
+    static coroutine start(Derived awaitable) {
+        co_await awaitable;
+    }
     constexpr static size_t buffer_size = noop_continuation_size;
     alignas(void*) mutable char buffer[buffer_size]{};
     std::coroutine_handle<> caller;
@@ -43,8 +46,7 @@ class Resumable {
     constexpr void await_resume() noexcept {}
 
     coroutine start() { 
-        Derived awaitable = std::move(static_cast<Derived*>(*this));
-        co_await awaitable;
+        return start(std::move(static_cast<Derived&>(*this)));
     }
 };
 } // namespace conduit::mixin
