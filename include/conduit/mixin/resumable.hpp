@@ -42,6 +42,9 @@ class Resumable {
     }
     constexpr void await_resume() noexcept {}
 
-    coroutine start() { co_await static_cast<Derived&>(*this); }
+    coroutine start() { 
+        Derived awaitable = std::move(static_cast<Derived*>(*this));
+        co_await awaitable;
+    }
 };
 } // namespace conduit::mixin
