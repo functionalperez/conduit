@@ -1,5 +1,6 @@
 #pragma once
 #include <conduit/continuation.hpp>
+#include <conduit/coroutine.hpp>
 
 namespace conduit::mixin {
 template <class Derived>
@@ -40,5 +41,7 @@ class Resumable {
         return run();
     }
     constexpr void await_resume() noexcept {}
+
+    coroutine start() { co_await static_cast<Derived&>(*this); }
 };
 } // namespace conduit::mixin
