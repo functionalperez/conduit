@@ -44,9 +44,5 @@ class Resumable {
         return run();
     }
     constexpr void await_resume() noexcept {}
-
-    coroutine start() { 
-        return start(std::move(static_cast<Derived&>(*this)));
-    }
 };
 } // namespace conduit::mixin
