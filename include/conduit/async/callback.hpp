@@ -40,6 +40,9 @@ class callback : mixin::AwaitReady<false>, mixin::AwaitResume {
         -> std::coroutine_handle<> {
         return h ? release(h) : std::noop_coroutine();
     }
+    inline void resume() {
+        release(h).resume();
+    }
     ~callback() {
         if (h)
             h.destroy();
