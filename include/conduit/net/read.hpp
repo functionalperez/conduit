@@ -65,7 +65,7 @@ future<read_result> read(asio::basic_stream_socket<Protocol>& socket) {
         auto response = co_await read_some(socket, buffer);
 
         if(!response) {
-            co_return read_result(response.status, result);
+            co_return read_result(response.status(), result);
         } 
 
         result += response;
