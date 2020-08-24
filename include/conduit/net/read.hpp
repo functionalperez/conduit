@@ -61,10 +61,14 @@ template <class Protocol>
 future<read_result> read(asio::basic_stream_socket<Protocol>& socket) {
     std::array<char, 1024> buffer;
     std::string result;
-    partial_read_result response;
-    while ((response = co_await async::read_some(socket, buffer))) {
+    while (true) {
+        auto response = co_await read_some(socket, buffer);
+
+        if(!response) {
+            co_return read_result(response.status, result);
+        } 
+
         result += response;
     }
-    co_return read_result{response.status(), result};
 }
 } // namespace conduit::async
