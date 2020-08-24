@@ -3,7 +3,7 @@
 #include <conduit/mixin/resumable.hpp>
 #include <conduit/coroutine.hpp>
 
-#include <conduit/net/responses.hpp>
+#include <conduit/io/responses.hpp>
 
 #include <boost/asio/basic_socket.hpp>
 

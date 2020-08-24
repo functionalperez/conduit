@@ -2,7 +2,7 @@
 #include <conduit/future.hpp>
 #include <conduit/mixin/resumable.hpp>
 
-#include <conduit/net/responses.hpp>
+#include <conduit/io/responses.hpp>
 
 #include <boost/asio/basic_socket.hpp>
 #include <boost/asio/ip/tcp.hpp>
@@ -62,10 +62,10 @@ future<read_result> read(asio::basic_stream_socket<Protocol>& socket) {
     std::array<char, 1024> buffer;
     std::string result;
     while (true) {
-        auto response = co_await read_some(socket, buffer);
+        auto response = co_await read_some{socket, buffer};
 
         if(!response) {
-            co_return read_result(response.status(), result);
+            co_return read_result{response.status(), result};
         } 
 
         result += response;
