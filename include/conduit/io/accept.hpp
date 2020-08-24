@@ -10,7 +10,7 @@
 #include <boost/asio/ip/tcp.hpp>
 #include <boost/system/error_code.hpp>
 
-namespace conduit::async {
+namespace conduit::io {
 namespace asio = boost::asio;
 
 template<class Protocol, class Executor>
@@ -21,7 +21,7 @@ class accept : public mixin::Resumable<accept<Protocol, Executor>> {
     socket_type& socket;
     error_code const* status = nullptr;
     auto get_handler(std::coroutine_handle<> h) {
-        return [this, caller = async::callback{h}](
+        return [this, caller = async::callback(h)](
                    error_code const& response) mutable {
             status = &response;
             caller.resume();

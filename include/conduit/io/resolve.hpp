@@ -9,7 +9,7 @@
 
 #include <coroutine>
 
-namespace conduit::async {
+namespace conduit::io {
 using boost::asio::ip::tcp;
 using boost::system::error_code;
 template <class...>
@@ -33,7 +33,7 @@ class resolve<boost::asio::ip::basic_resolver<Protocol, Executor>>
     endpoint_list endpoints;
 
     auto get_handler(std::coroutine_handle<> h) {
-        return [this, caller = callback(h)](error_code const& ec,
+        return [this, caller = async::callback(h)](error_code const& ec,
                                             endpoint_list r) mutable {
             ec_ptr = &ec;
             endpoints = std::move(r);

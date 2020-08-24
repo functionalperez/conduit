@@ -16,7 +16,7 @@
 #include <string>
 #include <string_view>
 
-namespace conduit::async {
+namespace conduit::io {
 using boost::asio::ip::tcp;
 namespace asio = boost::asio;
 
@@ -34,7 +34,7 @@ class read_some : public mixin::Resumable<read_some<Protocol>> {
     friend class mixin::Resumable<read_some>;
 
     auto get_handler(std::coroutine_handle<> h) {
-        return [this, caller = async::callback{h}](error_code const& response,
+        return [this, caller = async::callback(h)](error_code const& response,
                                                    size_t s) mutable {
             status = &response;
             buffer = buffer.subspan(0, s);

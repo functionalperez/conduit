@@ -10,7 +10,7 @@
 
 #include <coroutine>
 
-namespace conduit::async {
+namespace conduit::io {
 using boost::asio::ip::tcp;
 using boost::system::error_code;
 
@@ -27,7 +27,7 @@ struct connect<Protocol, EndpointSequence>
     error_code const* ec_pointer;
     endpoint const* ep_pointer;
     auto get_handler(std::coroutine_handle<> h) {
-        return [this, caller = callback(h)](error_code const& ec,
+        return [this, caller = async::callback(h)](error_code const& ec,
                                             endpoint const& ep) mutable {
             ec_pointer = &ec;
             ep_pointer = &ep;

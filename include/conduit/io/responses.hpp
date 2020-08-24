@@ -6,7 +6,7 @@
 #include <boost/asio/error.hpp>
 #include <boost/system/error_code.hpp>
 
-namespace conduit::async {
+namespace conduit::io {
 using boost::system::error_code;
 struct status_result : error_code {
     status_result() = default;

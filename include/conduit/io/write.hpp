@@ -11,7 +11,7 @@
 #include <coroutine>
 #include <string>
 
-namespace conduit::async {
+namespace conduit::io {
 using boost::asio::ip::tcp;
 namespace asio = boost::asio;
 
@@ -22,7 +22,7 @@ class write : public mixin::Resumable<write<Socket>> {
     error_code const* status;
 
     auto get_handler(std::coroutine_handle<> h) {
-        return [this, caller = async::callback{h}](error_code const& e,
+        return [this, caller = async::callback(h)](error_code const& e,
                                                    size_t s) mutable {
             status = &e;
             message = message.substr(0, s);
