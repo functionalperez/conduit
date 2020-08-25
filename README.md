@@ -2,36 +2,15 @@
 
 conduit is an educational/experimental library for coroutines as they were introduced in C++20. While I hope that this library will prove useful to the community. 
 
-## Building and running `example`
+- [Using Conduit](#Using Conduit)
+    - [Running tests](## Running tests)
+    - [Installing system-wide](##Installing system-wide)
+        - [Installing with cmake](###Installing with cmake)
+        - [Installing on Ubuntu](###Installing on Ubuntu)
+        - [Manual installation for arbitrary linux systems](###Manual installation for arbitrary linux systems)
+        - [Using the installed library)[### Using the installed library]
 
-In order to build `example.cpp`, execute the following commands:
-```bash
-# Download
-git clone https://github.com/functionalperez/conduit.git
-
-# Build
-cd conduit
-mkdir build
-cd build
-cmake .. && cmake --build .
-
-# Run
-./run_example
-```
-
-If you modify `example.cpp`, just rebuild by running `cmake --build .`.
-
-Alternatively, if you don't want to use CMake, just run:
-```bash
-# Download
-git clone https://github.com/functionalperez/conduit.git
-
-# Build
-cd conduit
-g++-10 -Iinclude -fcoroutines -std=c++20 example.cpp -o run_example
-
-# Run
-./run_example
+# Using Conduit
 ```
 ## Add to an existing project via git submodule
 
@@ -45,19 +24,39 @@ If you're taking this route and your project uses cmake, just add this line to y
 ```cmake
 add_subdirectory(conduit)
 ```
+## Running tests
 
-## Install System-wide for use in any project
+In order to ensure that your system is set up correctly, it's recommended to compile and run `main.cpp`, which contains tests for conduit.
+```bash
+# Download
+git clone https://github.com/functionalperez/conduit.git
+
+# Build
+cd conduit
+mkdir build
+cd build
+cmake .. -DCMAKE_CXX_COMPILER=clang++
+cmake --build .
+
+# Run
+./run_tests
+```
+
+Alternatively, if you don't want to use CMake, just run the following commands in the root directory of this project:
+```bash
+g++-10 -Iinclude -fcoroutines -std=c++20 main.cpp -o run_example
+
+./run_example
+```
+## Installing system-wide
 
 You can install Conduit on a system-wide basis, and this will allow you to use conduit in C++ projects without adding any additional compiler flags and without adding anything to your build file (although you'll still need to compile your project for C++20).
 
 ### Installing with cmake
 
-You can run the following commands to install conduit using cmake:
+In order to install conduit via cmake, run the following commands in the root directory of this project:
 ```bash
-git clone htttps://github.com/functionalperez/conduit.git
-
-cd conduit
-mkdir build
+mkdir -p build
 cd build
 cmake .. -DCMAKE_CXX_COMPILER=clang++
 cmake --install .
@@ -77,7 +76,7 @@ On Ubuntu, installation would be as follows:
 
 This will install Conduit in `/usr/local/include`, and Conduit can be uninstalled at any time by running `sudo apt remove conduit`.
 
-### Manual installation on linux systems
+### Manual installation for arbitrary linux systems
 
 Conduit can also be installed manually by running:
 ```bash
@@ -92,7 +91,7 @@ To uninstall manually, simply run
 sudo rm -r /usr/local/include/conduit
 ```
 
---- 
+### Using the installed library
 
 Once you've installed Conduit, you can use it as you would any other installed library:
 ```cpp
