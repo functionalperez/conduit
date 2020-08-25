@@ -63,8 +63,9 @@ generator<char> hello_message() {
 
 int main() {
     for(char c : hello_message()) {
-        std::cout << c << '\n';
+        std::cout << c;
     }
+    std::cout << std::endl;
 }
 ```
 ```bash
