@@ -6,16 +6,17 @@ conduit is an educational/experimental library for coroutines as they were intro
 
 ## Table of contents
 * [Using Conduit](#using-conduit)
-    * [Running tests](#running-tests)
+    * [Add to an existing project via git submodule](#Add-to-an-existing-project-via-git-submodule)
+        * [Running tests](#running-tests)
     * [Installing system-wide](#installing-system-wide)
         * [Installing with cmake](#installing-with-cmake)
         * [Installing on Ubuntu](#installing-on-Ubuntu)
         * [Manual installation for arbitrary linux systems](#manual-installation-for-arbitrary-linux-systems)
-        * [Using the installed library)[#using-the-installed-library]
+        * [Using the installed library](#using-the-installed-library)
 
 ## Using Conduit
-```
-## Add to an existing project via git submodule
+
+### Add to an existing project via git submodule
 
 Conduit can be added to an existing git repository by running
 ```bash
@@ -27,7 +28,7 @@ If you're taking this route and your project uses cmake, just add this line to y
 ```cmake
 add_subdirectory(conduit)
 ```
-### Running tests
+#### Running tests
 
 In order to ensure that your system is set up correctly, it's recommended to compile and run `main.cpp`, which contains tests for conduit.
 ```bash
