@@ -55,14 +55,14 @@ This will install Conduit in `/usr/local/include`, and you'll be able to use Con
 
 using namespace conduit;
 
-generator<char> get_message() {
+generator<char> hello_message() {
     for(char c : "Hello, world!") {
         co_yield c;
     }
 }
 
 int main() {
-    for(char c : get_message()) {
+    for(char c : hello_message()) {
         std::cout << c << '\n';
     }
 }
