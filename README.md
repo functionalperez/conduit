@@ -1,4 +1,4 @@
-# conduit
+# Conduit Coroutine Library for C++
 
 conduit is an educational/experimental library for coroutines as they were introduced in C++20. While I hope that this library will prove useful to the community. 
 
@@ -32,4 +32,41 @@ g++-10 -Iinclude -fcoroutines -std=c++20 example.cpp -o run_example
 
 # Run
 ./run_example
+```
+## Installing
+
+Conduit can be used in one of two ways. You could add this repository as submodule of your project via `git submodule`, or you can install it system-wide. 
+
+On Ubuntu, installation would be as follows:
+
+1. Download [conduit_0.1.0-0_all.deb](https://github.com/functionalperez/packages/raw/main/conduit/conduit_0.1.0-0_all.deb) (This is a download link)
+2. Go to your downloads folder (`cd ~/Downloads`)
+3. Run `sudo apt install ./conduit_0.1.0-0_all.deb`
+
+This will install Conduit in `/usr/local/include`, and you'll be able to use Conduit like you would any other system library:
+
+```
+// main.cpp
+#include <conduit/coroutine.hpp>
+#include <conduit/generator.hpp>
+
+#include <string>
+#include <iostream>
+
+using namespace conduit;
+
+generator<char> get_message() {
+    for(char c : "Hello, world!") {
+        co_yield c;
+    }
+}
+
+int main() {
+    for(char c : get_message()) {
+        std::cout << c << '\n';
+    }
+}
+```
+```
+clang++ main.cpp -std=c++20 -o main
 ```
