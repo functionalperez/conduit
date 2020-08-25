@@ -71,4 +71,17 @@ int main() {
 clang++ main.cpp -std=c++20 -o main
 ```
 
-Conduit can be uninstalled at any time by running `sudo apt remove conduit`
+Conduit can be uninstalled at any time by running `sudo apt remove conduit`.
+
+### Manual installation on linux systems
+
+Conduit can also be installed manually by running:
+```bash
+git clone https://github.com/functionalperez/conduit.git
+cd conduit
+sudo cp -r include/conduit /usr/local/include
+```
+To uninstall manually, simply run
+```bash
+sudo rm -r /usr/local/include/conduit
+```
