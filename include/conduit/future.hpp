@@ -32,8 +32,14 @@ struct optional_future : mixin::GetReturnObject<optional_future<ReturnValue>>,
 
 namespace conduit {
 template <class T>
-using future = async::coro<promise::future<T>>;
+struct future : async::coro<promise::future<T>> {
+    using promise_type = promise::future<T>;
+    using async::coro<promise::future<T>>::coro;
+};
 
 template <class T>
-using optional_future = async::coro<promise::optional_future<T>>;
+struct optional_future : async::coro<promise::optional_future<T>> {
+    using promise_type = promise::optional_future<T>;
+    using async::coro<promise::optional_future<T>>::coro;
+};
 } // namespace conduit
