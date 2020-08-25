@@ -78,8 +78,10 @@ Conduit can be uninstalled at any time by running `sudo apt remove conduit`.
 Conduit can also be installed manually by running:
 ```bash
 git clone https://github.com/functionalperez/conduit.git
-cd conduit
-sudo cp -r include/conduit /usr/local/include
+sudo cp -r conduit/include/conduit /usr/local/include
+
+# Optionally, remove the repo after installation as it's no longer needed
+rm -rf conduit
 ```
 To uninstall manually, simply run
 ```bash
