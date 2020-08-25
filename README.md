@@ -7,7 +7,7 @@ conduit is an educational/experimental library for coroutines as they were intro
 In order to build `example.cpp`, execute the following commands:
 ```bash
 # Download
-git clone https://github.com/jantonioperez/conduit.git
+git clone https://github.com/functionalperez/conduit.git
 
 # Build
 cd conduit
@@ -24,7 +24,7 @@ If you modify `example.cpp`, just rebuild by running `cmake --build .`.
 Alternatively, if you don't want to use CMake, just run:
 ```bash
 # Download
-git clone https://github.com/jantonioperez/conduit.git
+git clone https://github.com/functionalperez/conduit.git
 
 # Build
 cd conduit
