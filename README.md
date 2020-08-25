@@ -5,7 +5,7 @@ conduit is an educational/experimental library for coroutines as they were intro
 ## Building and running `example`
 
 In order to build `example.cpp`, execute the following commands:
-```
+```bash
 # Download
 git clone https://github.com/jantonioperez/conduit.git
 
@@ -45,7 +45,7 @@ On Ubuntu, installation would be as follows:
 
 This will install Conduit in `/usr/local/include`, and you'll be able to use Conduit like you would any other system library:
 
-```
+```cpp
 // main.cpp
 #include <conduit/coroutine.hpp>
 #include <conduit/generator.hpp>
