@@ -22,7 +22,7 @@ cmake .. && cmake --build .
 If you modify `example.cpp`, just rebuild by running `cmake --build .`.
 
 Alternatively, if you don't want to use CMake, just run:
-```
+```bash
 # Download
 git clone https://github.com/jantonioperez/conduit.git
 
@@ -41,7 +41,7 @@ On Ubuntu, installation would be as follows:
 
 1. Download [conduit_0.1.0-0_all.deb](https://github.com/functionalperez/packages/raw/main/conduit/conduit_0.1.0-0_all.deb) (This is a download link)
 2. Go to your downloads folder (`cd ~/Downloads`)
-3. Run `sudo apt install ./conduit_0.1.0-0_all.deb`
+3. Run `sudo apt install ./conduit_0.1.0-0_all.deb` (or just double-click the package in your file manager)
 
 This will install Conduit in `/usr/local/include`, and you'll be able to use Conduit like you would any other system library:
 
@@ -67,6 +67,8 @@ int main() {
     }
 }
 ```
-```
+```bash
 clang++ main.cpp -std=c++20 -o main
 ```
+
+Conduit can be uninstalled at any time by running `sudo apt remove conduit`
