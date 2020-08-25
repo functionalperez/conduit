@@ -2,13 +2,14 @@
 
 conduit is an educational/experimental library for coroutines as they were introduced in C++20. While I hope that this library will prove useful to the community. 
 
-- [Using Conduit](#Using Conduit)
-    - [Running tests](## Running tests)
-    - [Installing system-wide](##Installing system-wide)
-        - [Installing with cmake](###Installing with cmake)
-        - [Installing on Ubuntu](###Installing on Ubuntu)
-        - [Manual installation for arbitrary linux systems](###Manual installation for arbitrary linux systems)
-        - [Using the installed library)[### Using the installed library]
+## Table of contents
+* [Using Conduit](#using-conduit)
+    * [Running tests](#running-tests)
+    * [Installing system-wide](#installing-system-wide)
+        * [Installing with cmake](#installing-with-cmake)
+        * [Installing on Ubuntu](#installing-on-Ubuntu)
+        * [Manual installation for arbitrary linux systems](#manual-installation-for-arbitrary-linux-systems)
+        * [Using the installed library)[### Using the installed library]
 
 # Using Conduit
 ```
