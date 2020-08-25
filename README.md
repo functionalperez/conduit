@@ -41,7 +41,7 @@ On Ubuntu, installation would be as follows:
 
 1. Download [conduit.deb](https://github.com/functionalperez/packages/raw/main/conduit/conduit.deb) (This is a download link)
 2. Go to your downloads folder (`cd ~/Downloads`)
-3. Run `sudo apt install ./conduit_0.1.0-0_all.deb` (or just double-click the package in your file manager)
+3. Run `sudo apt install ./conduit.deb` (or just double-click conduit.deb in your file manager)
 
 This will install Conduit in `/usr/local/include`, and you'll be able to use Conduit like you would any other system library:
 
