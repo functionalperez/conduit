@@ -9,7 +9,7 @@ conduit is an educational/experimental library for coroutines as they were intro
         * [Installing with cmake](#installing-with-cmake)
         * [Installing on Ubuntu](#installing-on-Ubuntu)
         * [Manual installation for arbitrary linux systems](#manual-installation-for-arbitrary-linux-systems)
-        * [Using the installed library)[### Using the installed library]
+        * [Using the installed library)[#using-the-installed-library]
 
 # Using Conduit
 ```
