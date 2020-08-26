@@ -27,7 +27,10 @@ struct generator : mixin::GetReturnObject<generator<T>>,
 
 namespace conduit {
 template <class T>
-using generator = unique_handle<promise::generator<T>>;
+struct generator : unique_handle<promise::generator<T>> {
+    using promise_type = promise::generator<T>;
+    using unique_handle<promise::generator<T>>::unique_handle;
+};
 
 template <class T>
 auto begin(generator<T>& g)

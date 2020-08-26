@@ -41,5 +41,8 @@ struct source<void> : mixin::HasOwnerAndCallback,
 
 namespace conduit {
 template <class T>
-using source = async::coro<promise::source<T>>;
+struct source : async::coro<promise::source<T>> {
+    using promise_type = promise::source<T>;
+    using async::coro<promise::source<T>>::coro;
+};
 } // namespace conduit
