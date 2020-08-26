@@ -1,4 +1,4 @@
-![Conduit Logo](/images/logo.jpeg)
+![Conduit Logo](/images/logo.png)
 
 # Conduit Coroutine Library for C++
 
