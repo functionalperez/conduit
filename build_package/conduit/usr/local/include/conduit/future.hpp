@@ -24,7 +24,7 @@ struct optional_future : mixin::GetReturnObject<optional_future<ReturnValue>>,
 
     void return_value(ReturnValue const& r) { result.emplace(r); }
     void return_value(ReturnValue&& r) { result.emplace(std::move(r)); }
-    void return_value(tags::nothing_t) {}
+    void return_value(nothing_t) {}
     std::optional<ReturnValue> get_value() & { return std::move(result); }
     std::optional<ReturnValue> get_value() && { return std::move(result); }
 };

@@ -53,11 +53,11 @@ struct GetReturnObject<Promise, false> {
     // Allows you access to the promise object from within a coroutine via
     // auto& promise = co_yield get_promise;
     // await_ready() always returns true
-    inline auto yield_value(tags::get_promise_t) noexcept {
+    inline auto yield_value(get_promise_t) noexcept {
         return async::immediate_value{static_cast<Promise*>(this)};
     }
 
-    inline auto yield_value(tags::get_handle_t) noexcept {
+    inline auto yield_value(get_handle_t) noexcept {
         return async::immediate_value{get_handle()};
     }
 

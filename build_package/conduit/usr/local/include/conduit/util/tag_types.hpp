@@ -1,7 +1,7 @@
 #pragma once
 #include <conduit/util/concepts.hpp>
 
-namespace conduit::tags {
+namespace conduit {
 struct get_promise_t {
     explicit get_promise_t() = default;
 };
