@@ -2,7 +2,7 @@
 
 #if __has_include(<coroutine>)
 #if defined(__clang__) && !defined(__cpp_coroutines)
-#define __cpp_coroutines
+#define __cpp_coroutines 1
 #endif
 #include <coroutine>
 
