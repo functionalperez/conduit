@@ -10,5 +10,8 @@ struct task : mixin::GetReturnObject<task>,
               mixin::ReturnVoid {};
 } // namespace promise
 
-using task = async::coro<promise::task>;
+struct task : async::coro<promise::task> {
+    using promise_type = promise::task;
+    using async::coro<promise::task>::coro;  
+};
 } // namespace conduit

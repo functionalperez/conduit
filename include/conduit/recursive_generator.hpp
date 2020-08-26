@@ -4,6 +4,10 @@
 #include <conduit/util/iterator.hpp>
 #include <conduit/util/unique_handle.hpp>
 
+namespace conduit {
+template <class T>
+struct recursive_generator;
+}
 namespace conduit::promise {
 template <
     // Type output by generator
@@ -15,16 +19,16 @@ template <
     class T>
 struct recursive_generator : mixin::InitialSuspend<false>,
                              mixin::UnhandledException<> {
-    using return_object = unique_handle<recursive_generator>;
+    using return_object = conduit::recursive_generator<T>;
     using handle_type = std::coroutine_handle<recursive_generator>;
-    return_object* sauce = nullptr;
+    unique_handle<recursive_generator>* sauce = nullptr;
     T const* pointer = nullptr;
 
    public:
     auto get_return_object() {
         return return_object{handle_type::from_promise(*this)};
     }
-    void set_return_object(return_object* sauce) { this->sauce = sauce; }
+    void set_return_object(unique_handle<recursive_generator>* sauce) { this->sauce = sauce; }
 
     void return_value(return_object new_generator) {
         sauce->assign_no_destroy(std::move(new_generator));
@@ -49,7 +53,10 @@ struct recursive_generator : mixin::InitialSuspend<false>,
 
 namespace conduit {
 template <class T>
-using recursive_generator = unique_handle<promise::recursive_generator<T>>;
+struct recursive_generator : unique_handle<promise::recursive_generator<T>> {
+    using promise_type = promise::recursive_generator<T>;
+    using unique_handle<promise_type>::unique_handle;
+};
 
 template <class T>
 auto begin(recursive_generator<T>& g)
