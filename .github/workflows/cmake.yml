@@ -28,7 +28,7 @@ jobs:
             package: g++-10
         
           - name: ubuntu-latest-clang-10
-            compiler: clang++
+            compiler: clang++-10
             package: clang-10
 
     steps:
