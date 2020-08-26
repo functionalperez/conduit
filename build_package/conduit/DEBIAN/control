@@ -1,7 +1,0 @@
-Package: conduit
-Version: 0.1.0
-Maintainer: A. Perez <perez.cs@pm.me>
-Description: Conduit Coroutine Library for C++
-Homepage: https://github.com/functionalperez/conduit
-Architecture: all
-Depends: g++-10, clang-10
