@@ -25,11 +25,11 @@ jobs:
         include:
           - name: ubuntu-latest-gcc-10
             compiler: g++-10
-            package: g++-10
+            package: sudo apt install g++-10
         
           - name: ubuntu-latest-clang-10
             compiler: clang++-10
-            package: clang-10
+            package: sudo apt install g++-10 && sudo apt install clang-10
 
     steps:
     - uses: actions/checkout@v2
