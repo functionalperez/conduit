@@ -1,6 +1,9 @@
 #pragma once
 
 #if __has_include(<coroutine>)
+#if defined(__clang__) && !defined(__cpp_coroutines)
+#define __cpp_coroutines
+#endif
 #include <coroutine>
 
 #ifdef __clang__
