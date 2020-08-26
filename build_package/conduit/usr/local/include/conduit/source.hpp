@@ -35,15 +35,11 @@ struct source<void> : mixin::HasOwnerAndCallback,
                       mixin::UnhandledException<true>,
                       mixin::ReturnVoid {
    public:
-    auto yield_value(tags::nothing_t) noexcept { return callback.release(); }
-    auto yield_value(int) noexcept { return callback.release(); }
+    auto yield_value(nothing_t) noexcept { return callback.release(); }
 };
 } // namespace conduit::promise
 
 namespace conduit {
 template <class T>
-struct source : async::coro<promise::source<T>> {
-    using promise_type = promise::source<T>;
-    using async::coro<promise::source<T>>::coro;
-};
+using source = async::coro<promise::source<T>>;
 } // namespace conduit

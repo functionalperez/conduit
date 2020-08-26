@@ -86,7 +86,7 @@ future<std::string> test_on_suspend(std::string on_success) {
 auto example_recursive_generator(std::string_view s)
     -> recursive_generator<char> {
     if (s.empty()) {
-        co_return nothing;
+        co_return tags::nothing;
     } else {
         co_yield s[0];
         co_return example_recursive_generator(s.substr(1));
