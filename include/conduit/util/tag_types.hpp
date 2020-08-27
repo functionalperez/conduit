@@ -2,6 +2,11 @@
 #include <conduit/util/concepts.hpp>
 
 namespace conduit::tags {
+struct on_resume_t {
+    explicit on_resume_t() = default;
+};
+constexpr auto on_resume = on_resume_t();
+
 struct get_promise_t {
     explicit get_promise_t() = default;
 };
@@ -30,4 +35,4 @@ struct nothing_t {
 };
 constexpr auto nothing = nothing_t();
 
-} // namespace conduit
+} // namespace conduit::tags

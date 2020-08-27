@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.0.0)
-project(conduit VERSION 0.1.2 LANGUAGES CXX)
+project(conduit VERSION 0.2.0 LANGUAGES CXX)
 
 option(CONDUIT_Install "Install CMake targets during install step." ON)
 

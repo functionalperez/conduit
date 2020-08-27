@@ -6,6 +6,7 @@
 #include <conduit/source.hpp>
 #include <conduit/task.hpp>
 #include <conduit/async/destroy.hpp>
+#include <conduit/async/suspend_invoke.hpp>
 #include <cstdio>
 #include <cstdlib>
 #include <iostream>
@@ -72,7 +73,6 @@ future<std::string> test_generator(std::string on_success) {
     co_return std::string(begin(g), end(g));
 }
 
-
 future<std::string> test_on_suspend(std::string on_success) {
     std::string result;
     auto f = [](std::coroutine_handle<> h, std::string& result, std::string& on_success) {
@@ -112,6 +112,15 @@ future<std::string> test_source(std::string on_success) {
     co_return result;
 }
 
+future<std::string> test_suspend_invoke(std::string on_success) {
+    std::string result;
+    co_await async::suspend_invoke{[&](std::coroutine_handle<> h) {
+        result = on_success;
+        h.resume();
+    }};
+    co_return result;
+}
+
 future<std::string> test_task(std::string on_success) {
     auto coro = [&](std::string& s) -> task {
         s = on_success;
@@ -133,6 +142,7 @@ coroutine run_tests() {
     RUN_TEST(test_on_suspend);
     RUN_TEST(test_recursive_generator);
     RUN_TEST(test_source);
+    RUN_TEST(test_suspend_invoke);
     RUN_TEST(test_task);
 }
 

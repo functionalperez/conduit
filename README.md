@@ -74,7 +74,7 @@ rm -rf conduit
 
 On Ubuntu, installation would be as follows:
 
-1. Download [conduit.deb](https://github.com/functionalperez/conduit/releases/download/v0.1.2/conduit_0.1.2-0_all.deb) (This is a download link)
+1. Download [conduit.deb](https://github.com/functionalperez/conduit/releases/download/v0.2.0/conduit_0.2.0-0_all.deb) (This is a download link)
 2. Go to your downloads folder (`cd ~/Downloads`)
 3. Run `sudo apt install ./conduit.deb` (or just double-click the file to open it in the installer)
 
