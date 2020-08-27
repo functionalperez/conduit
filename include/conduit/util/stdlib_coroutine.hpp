@@ -1,12 +1,10 @@
 #pragma once
 
 #if __has_include(<coroutine>)
-#if __cpp_coroutines
-#include <coroutine>
-#else 
-#define __cpp_coroutines 201902
-#include <coroutine>
+#if defined(__clang__) && !defined(__cpp_impl_coroutine)
+#define __cpp_impl_coroutine 201902L
 #endif
+#include <coroutine>
 
 #ifdef __clang__
 namespace std::experimental {
