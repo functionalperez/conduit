@@ -1,7 +1,9 @@
 #pragma once
 #include <conduit/util/stdlib_coroutine.hpp>
+
 #include <cstddef>
 #include <type_traits>
+#include <utility>
 
 namespace conduit {
 // clang-format off
@@ -72,5 +74,10 @@ concept can_co_return = co_result<Result>
 
 template<class Promise>
 concept awaitable_promise = awaitable<Promise> && co_promise<Promise>;
+
+template<class Func, class... Args>
+concept invokable_with = requires(Func f, Args... args) {
+    { f(std::forward<Args>(args)...) };
+};
 // clang-format on
 } // namespace conduit
