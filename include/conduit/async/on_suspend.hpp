@@ -7,8 +7,7 @@
 namespace conduit::async {
 template <class F>
 struct on_suspend_type : mixin::Resumable<on_suspend_type<F>> {
-    [[no_unique_address]] F func;
-    void on_suspend(std::coroutine_handle<> caller) { func(caller); }
+    [[no_unique_address]] F on_suspend;
 };
 
 template <class F>
