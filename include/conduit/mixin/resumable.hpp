@@ -5,12 +5,13 @@
 namespace conduit::mixin {
 template <class Derived>
 class Resumable {
-    static coroutine start(Derived awaitable) {
-        co_await awaitable;
-    }
     constexpr static size_t buffer_size = noop_continuation_size;
     alignas(void*) mutable char buffer[buffer_size]{};
+
+   public:
     std::coroutine_handle<> caller;
+
+   private:
     continuation<Resumable> run() { co_return; }
 
     void* alloc(size_t size) {
@@ -26,13 +27,15 @@ class Resumable {
     static void dealloc(void* addr, size_t size) {
         if (size <= buffer_size) {
             Resumable* pointer_to_allocator = (Resumable*)addr;
-            static_cast<Derived*>(pointer_to_allocator)->on_suspend(pointer_to_allocator->caller);
+            static_cast<Derived*>(pointer_to_allocator)
+                ->on_suspend(pointer_to_allocator->caller);
         } else {
             constexpr size_t offset = sizeof(Resumable*);
             Resumable* pointer_to_allocator =
                 *(Resumable**)((char*)addr - offset);
             delete[]((char*)addr - offset);
-            static_cast<Derived*>(pointer_to_allocator)->on_suspend(pointer_to_allocator->caller);
+            static_cast<Derived*>(pointer_to_allocator)
+                ->on_suspend(pointer_to_allocator->caller);
         }
     }
     friend class mixin::NewAndDelete<Resumable>;
@@ -45,4 +48,5 @@ class Resumable {
     }
     constexpr void await_resume() noexcept {}
 };
+
 } // namespace conduit::mixin
