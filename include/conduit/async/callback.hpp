@@ -43,6 +43,9 @@ class callback : mixin::AwaitReady<false>, mixin::AwaitResume {
     inline void resume() {
         release(h).resume();
     }
+    inline void operator()() {
+        release(h).resume();
+    }
     ~callback() {
         if (h)
             h.destroy();
