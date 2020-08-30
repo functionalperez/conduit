@@ -9,6 +9,39 @@
 namespace conduit::mixin {
 enum suspend : bool { always = true, never = false };
 
+#if CONDUIT_USE_GCC_EXCEPTION_WORKAROUND
+namespace detail {
+using remuse_coro_t = void (*)();
+using destroy_coro_t = void (*)();
+struct frame_header_t {
+    remuse_coro_t resume_coro;
+    destroy_coro_t destroy_coro;
+};
+} // namespace detail
+template <bool suspend>
+struct InitialSuspend {
+    // If CONDUIT_USE_GCC_EXCEPTION_WORKAROUND is defined, then we need to keep
+    // track of this value in order to destroy the frame manually. This value is
+    // recorded inside initial_suspend_t
+    detail::destroy_coro_t destroy_coro = nullptr;
+
+    struct initial_suspend_t {
+        detail::destroy_coro_t& destroy_coro_ref;
+
+        inline constexpr bool await_ready() { return false; }
+        inline bool await_suspend(std::coroutine_handle<> h) {
+            destroy_coro_ref =
+                ((detail::frame_header_t*)h.address())->destroy_coro;
+            return suspend; // The coroutine is resumed if suspend is false
+        }
+        inline constexpr void await_resume() noexcept {}
+    };
+
+    inline constexpr auto initial_suspend() noexcept {
+        return initial_suspend_t{destroy_coro};
+    }
+};
+#else
 template <bool suspend>
 struct InitialSuspend {
     inline constexpr auto initial_suspend() noexcept {
@@ -19,6 +52,7 @@ struct InitialSuspend {
         }
     }
 };
+#endif
 template <bool suspend>
 struct FinalSuspend {
     inline constexpr auto final_suspend() noexcept {
@@ -32,13 +66,25 @@ struct FinalSuspend {
 struct ReturnVoid {
     inline constexpr void return_void() noexcept {}
 };
-template <bool IsNoexcept = true>
+
+template <class DerivedPromise>
 struct UnhandledException {
-    [[noreturn]] void unhandled_exception() noexcept { std::terminate(); }
-};
-template <>
-struct UnhandledException<false> {
-    void unhandled_exception() noexcept {}
+    void unhandled_exception() {
+        // NB: for some reason, GCC doesn't destroy the coroutine frame if
+        // there's an exception raised inside the coroutine. As a result, if
+        // we're on GCC, we need to destroy it manually.
+
+#ifdef CONDUIT_USE_GCC_EXCEPTION_WORKAROUND
+        DerivedPromise& promise = static_cast<DerivedPromise&>(*this);
+        auto coro_frame = static_cast<detail::frame_header_t*>(
+            std::coroutine_handle<DerivedPromise>::from_promise(promise)
+                .address());
+        coro_frame->destroy_coro = promise.destroy_coro;
+        std::coroutine_handle<>::from_address(coro_frame).destroy();
+#endif
+
+        std::rethrow_exception(std::current_exception());
+    }
 };
 template <class Promise, bool IsNoexcept = true>
 struct GetReturnObject;

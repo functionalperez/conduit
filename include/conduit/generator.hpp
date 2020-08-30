@@ -8,7 +8,7 @@ template <class T>
 struct generator : mixin::GetReturnObject<generator<T>>,
                    mixin::InitialSuspend<false>,
                    mixin::FinalSuspend<true>,
-                   mixin::UnhandledException<>,
+                   mixin::UnhandledException<generator<T>>,
                    mixin::ReturnVoid {
    private:
     // yielded value stored here

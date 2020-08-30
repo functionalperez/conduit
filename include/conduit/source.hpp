@@ -10,7 +10,7 @@ namespace conduit::promise {
 template <class ReturnValue>
 struct source : mixin::HasOwnerAndCallback,
                 mixin::GetReturnObject<source<ReturnValue>>,
-                mixin::UnhandledException<true> {
+                mixin::UnhandledException<source<ReturnValue>> {
    private:
     ReturnValue const* pointer = nullptr;
 
@@ -32,7 +32,7 @@ struct source : mixin::HasOwnerAndCallback,
 template <>
 struct source<void> : mixin::HasOwnerAndCallback,
                       mixin::GetReturnObject<source<void>>,
-                      mixin::UnhandledException<true>,
+                      mixin::UnhandledException<source<void>>,
                       mixin::ReturnVoid {
    public:
     auto yield_value(tags::nothing_t) noexcept { return callback.release(); }

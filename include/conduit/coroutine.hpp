@@ -15,7 +15,7 @@ namespace conduit::promise {
 // and can't be resumed or checked for being done
 struct coroutine : mixin::InitialSuspend<false>,
                    mixin::FinalSuspend<false>,
-                   mixin::UnhandledException<>,
+                   mixin::UnhandledException<coroutine>,
                    mixin::ReturnVoid {
 
     auto get_return_object() noexcept { return conduit::coroutine{}; }
