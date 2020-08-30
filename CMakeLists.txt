@@ -4,7 +4,7 @@ project(conduit VERSION 0.3.0 LANGUAGES CXX)
 option(CONDUIT_Install "Install CMake targets during install step." ON)
 
 if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC" )
-    add_compile_options("/std:c++latest" "/await")
+    add_compile_options("/std:c++latest" "/await" "/EHsc")
 endif()
 
 if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang" )
