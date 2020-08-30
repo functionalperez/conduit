@@ -8,7 +8,7 @@ namespace conduit::async {
 // coroutine is resumed
 class callback {
     std::coroutine_handle<> h = nullptr;
-    static auto release(std::coroutine_handle<>& h) noexcept
+    static inline auto release(std::coroutine_handle<>& h) noexcept
         -> std::coroutine_handle<> {
         auto hold = h;
         h = nullptr;
@@ -17,19 +17,19 @@ class callback {
 
    public:
     using self = callback;
-    constexpr callback() = default;
-    constexpr callback(std::nullptr_t) noexcept : h(nullptr) {}
-    constexpr callback(std::coroutine_handle<> h) noexcept : h(h) {}
+    callback() = default;
+    callback(std::nullptr_t) noexcept : h(nullptr) {}
+    callback(std::coroutine_handle<> h) noexcept : h(h) {}
     callback(const callback&) = delete;
     callback(callback&& source) noexcept : h(release(source.h)) {}
     // Releases ownership of the coroutine and produces an async::jump
     // with that coroutine
-    [[nodiscard]] auto release() noexcept -> jump { return jump{release(h)}; }
-    constexpr void emplace(std::coroutine_handle<> handle) noexcept {
+    [[nodiscard]] inline auto release() noexcept -> jump { return jump{release(h)}; }
+    inline void emplace(std::coroutine_handle<> handle) noexcept {
         h = handle;
     }
 
-    constexpr void swap(callback& other) noexcept {
+    inline void swap(callback& other) noexcept {
         auto temp = other.h;
         other.h = h;
         h = temp;
