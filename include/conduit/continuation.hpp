@@ -5,7 +5,7 @@
 namespace conduit::promise {
 template <class Alloc>
 struct continuation : mixin::GetReturnObject<continuation<Alloc>, false>,
-                      mixin::UnhandledException<true>,
+                      mixin::UnhandledException<continuation<Alloc>>,
                       mixin::InitialSuspend<mixin::always>,
                       mixin::FinalSuspend<mixin::never>,
                       mixin::ReturnVoid,

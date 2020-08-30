@@ -8,7 +8,7 @@ namespace conduit::promise {
 template <class ReturnValue>
 struct future : mixin::GetReturnObject<future<ReturnValue>>,
                 mixin::HasOwnerAndCallback,
-                mixin::UnhandledException<true> {
+                mixin::UnhandledException<future<ReturnValue>> {
     std::optional<ReturnValue> result;
     void return_value(ReturnValue const& r) { result.emplace(r); }
     void return_value(ReturnValue&& r) { result.emplace(std::move(r)); }
@@ -19,7 +19,7 @@ struct future : mixin::GetReturnObject<future<ReturnValue>>,
 template <class ReturnValue>
 struct optional_future : mixin::GetReturnObject<optional_future<ReturnValue>>,
                          mixin::HasOwnerAndCallback,
-                         mixin::UnhandledException<true> {
+                         mixin::UnhandledException<optional_future<ReturnValue>> {
     std::optional<ReturnValue> result;
 
     void return_value(ReturnValue const& r) { result.emplace(r); }

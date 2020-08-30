@@ -18,7 +18,7 @@ template <
     // Type output by generator
     class T>
 struct recursive_generator : mixin::InitialSuspend<false>,
-                             mixin::UnhandledException<> {
+                             mixin::UnhandledException<recursive_generator<T>> {
     using return_object = conduit::recursive_generator<T>;
     using handle_type = std::coroutine_handle<recursive_generator>;
     unique_handle<recursive_generator>* sauce = nullptr;

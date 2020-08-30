@@ -16,7 +16,14 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set(CONDUIT_TARGET_NAME ${PROJECT_NAME})
 set(CONDUIT_INCLUDE_BUILD_DIR "${PROJECT_SOURCE_DIR}/include/")
 
+set(THREADS_PREFER_PTHREAD_FLAG ON)
+find_package(Threads REQUIRED)
+
 add_executable(run_tests main.cpp)
+
+target_link_libraries(run_tests PRIVATE Threads::Threads)
+
+
 
 add_library(${CONDUIT_TARGET_NAME} INTERFACE)
  

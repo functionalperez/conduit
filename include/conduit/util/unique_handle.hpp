@@ -24,11 +24,6 @@ struct unique_handle : private std::coroutine_handle<Promise> {
     // Type of the coroutine handle
     using handle = std::coroutine_handle<Promise>;
 
-    // true if the coroutine always suspends initially
-    constexpr static bool suspends_initially =
-        std::is_same_v<std::suspend_always,
-                       decltype(declPromise().initial_suspend())>;
-
     // Returns true if the coroutine handle isn't null
     using super::operator bool;
     // Checks if the coroutine has finished executing

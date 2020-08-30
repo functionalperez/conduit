@@ -6,7 +6,7 @@ namespace conduit {
 namespace promise {
 struct task : mixin::GetReturnObject<task>,
               mixin::HasOwnerAndCallback,
-              mixin::UnhandledException<true>,
+              mixin::UnhandledException<task>,
               mixin::ReturnVoid {};
 } // namespace promise
 
