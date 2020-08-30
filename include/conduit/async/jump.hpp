@@ -3,7 +3,7 @@
 
 namespace conduit::async {
 struct jump {
-    std::coroutine_handle<> callback = std::noop_coroutine();
+    std::coroutine_handle<> callback = nullptr;
     constexpr bool await_ready() noexcept { return false; }
     constexpr auto await_suspend(std::coroutine_handle<>) noexcept {
         return callback;

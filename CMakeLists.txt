@@ -3,10 +3,12 @@ project(conduit VERSION 0.3.0 LANGUAGES CXX)
 
 option(CONDUIT_Install "Install CMake targets during install step." ON)
 
-add_compile_options("-std=c++20")
+if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang" )
+    add_compile_options("-std=c++20")
+endif()
 
 if ("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU" )
-  add_compile_options("-fcoroutines")
+    add_compile_options("-std=c++20" "-fcoroutines")
 endif()
 
 include_directories(include)

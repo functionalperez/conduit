@@ -6,7 +6,7 @@ namespace conduit::async {
 // Holds ownership of a coroutine handle until it's co_await`d on,
 // at which point it releases ownership of the coroutine, and the
 // coroutine is resumed
-class callback : mixin::AwaitReady<false>, mixin::AwaitResume {
+class callback {
     std::coroutine_handle<> h = nullptr;
     static auto release(std::coroutine_handle<>& h) noexcept
         -> std::coroutine_handle<> {
@@ -33,12 +33,6 @@ class callback : mixin::AwaitReady<false>, mixin::AwaitResume {
         auto temp = other.h;
         other.h = h;
         h = temp;
-    }
-    using AwaitReady<false>::await_ready;
-    using AwaitResume::await_resume;
-    auto await_suspend(std::coroutine_handle<>) noexcept
-        -> std::coroutine_handle<> {
-        return h ? release(h) : std::noop_coroutine();
     }
     inline void resume() {
         release(h).resume();

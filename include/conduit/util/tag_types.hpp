@@ -25,7 +25,6 @@ constexpr auto get_message = get_message_t();
 enum generator_mode : bool { check_first = false, resume_first = true };
 
 struct nothing_t {
-    using promise_type = std::noop_coroutine_promise;
     explicit nothing_t() = default;
 
     template <co_result coro>
