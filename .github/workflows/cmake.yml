@@ -13,7 +13,7 @@ jobs:
     # well on Windows or Mac.  You can convert this to a matrix build if you need
     # cross-platform coverage.
     # See: https://docs.github.com/en/actions/configuring-and-managing-workflows/configuring-a-workflow#configuring-a-build-matrix
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
 
     strategy:
       fail-fast: false
@@ -29,30 +29,35 @@ jobs:
 
         include:
           - name: ubuntu-latest-gcc-10-debug
+            os: ubuntu-latest
             compiler: g++-10
             flags: ""
             build_type: Debug
             install-compiler: sudo apt install g++-10
         
           - name: ubuntu-latest-clang-10-debug
+            os: ubuntu-latest
             compiler: clang++-10
             flags: ""
             build_type: Debug
             install-compiler: sudo apt install g++-10 && sudo apt install clang-10
 
           - name: ubuntu-latest-gcc-10-release
+            os: ubuntu-latest
             compiler: g++-10
             flags: ""
             build_type: Release
             install-compiler: sudo apt install g++-10
         
           - name: ubuntu-latest-clang-10-release
+            os: ubuntu-latest
             compiler: clang++-10
             flags: ""
             build_type: Release
             install-compiler: sudo apt install g++-10 && sudo apt install clang-10
 
           - name: ubuntu-latest-clang-10-debug-libc++
+            os: ubuntu-latest
             compiler: $HOME/clang+llvm-10.0.0-x86_64-linux-gnu-ubuntu-18.04/bin/clang++
             flags: "-stdlib=libc++"
             build_type: Debug
@@ -61,6 +66,7 @@ jobs:
               && tar -xvf clang+llvm-10.0.0-x86_64-linux-gnu-ubuntu-18.04.tar.xz"
 
           - name: ubuntu-latest-clang-10-release-libc++
+            os: ubuntu-latest
             compiler: $HOME/clang+llvm-10.0.0-x86_64-linux-gnu-ubuntu-18.04/bin/clang++
             flags: "-stdlib=libc++"
             build_type: Release
@@ -68,6 +74,19 @@ jobs:
               && wget https://github.com/llvm/llvm-project/releases/download/llvmorg-10.0.0/clang+llvm-10.0.0-x86_64-linux-gnu-ubuntu-18.04.tar.xz \
               && tar -xvf clang+llvm-10.0.0-x86_64-linux-gnu-ubuntu-18.04.tar.xz"
 
+          - name: windows-2019-cl-debug
+            os: windows-2019
+            compiler: cl
+            flags: "/std:c++latest"
+            build_type: Debug
+            install-compiler: "echo [Assuming cl exists]"
+
+          - name: windows-2019-cl-release
+            os: windows-2019
+            compiler: cl
+            flags: "/std:c++latest"
+            build_type: Release
+            install-compiler: "echo [Assuming cl exists]"
     steps:
     - uses: actions/checkout@v2
     
