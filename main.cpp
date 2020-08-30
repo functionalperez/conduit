@@ -2,7 +2,6 @@
 #include <chrono>
 #include <conduit/async/destroy.hpp>
 #include <conduit/async/on_suspend.hpp>
-#include <conduit/async/suspend_invoke.hpp>
 #include <conduit/coroutine.hpp>
 #include <conduit/future.hpp>
 #include <conduit/generator.hpp>

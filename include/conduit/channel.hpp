@@ -2,7 +2,6 @@
 #include <boost/asio/io_context.hpp>
 #include <boost/asio/post.hpp>
 #include <conduit/util/unique_awaitable.hpp>
-#include <conduit/mixin/resumable.hpp>
 #include <conduit/util/concepts.hpp>
 #include <conduit/util/stdlib_coroutine.hpp>
 
@@ -81,11 +80,11 @@ struct channel {
     atomic_stack<unique_awaitable<async_recieve>> awaiting;
     atomic_stack<T> sent_values;
 
-    struct async_recieve : mixin::Resumable<async_recieve> {
+    struct async_recieve {
         channel<T>& ch;
         T value;
         bool await_ready() { return ch.sent_values.pop(value); }
-        void on_suspend(std::coroutine_handle<> h) { ch.awaiting.emplace(this); }
+        void await_suspend(std::coroutine_handle<> h) { ch.awaiting.emplace(this); }
         T await_resume() { return std::move(value); }
     };
     channel& send(T const& value) {

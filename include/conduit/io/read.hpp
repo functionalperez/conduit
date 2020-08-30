@@ -1,6 +1,6 @@
 #pragma once
 #include <conduit/future.hpp>
-#include <conduit/mixin/resumable.hpp>
+#include <conduit/async/callback.hpp>
 
 #include <conduit/io/responses.hpp>
 
@@ -21,7 +21,7 @@ using boost::asio::ip::tcp;
 namespace asio = boost::asio;
 
 template <class Protocol>
-class read_some : public mixin::Resumable<read_some<Protocol>> {
+class read_some {
     using socket_type = boost::asio::basic_stream_socket<Protocol>;
     template <size_t N>
     using char_buff = char[N];
@@ -31,8 +31,6 @@ class read_some : public mixin::Resumable<read_some<Protocol>> {
 
     std::span<char> buffer;
 
-    friend class mixin::Resumable<read_some>;
-
     auto get_handler(std::coroutine_handle<> h) {
         return [this, caller = async::callback(h)](error_code const& response,
                                                    size_t s) mutable {
@@ -41,10 +39,6 @@ class read_some : public mixin::Resumable<read_some<Protocol>> {
             caller.resume();
         };
     }
-    void on_suspend(std::coroutine_handle<> h) {
-        socket.async_read_some(
-            asio::mutable_buffer(buffer.data(), buffer.size()), get_handler(h));
-    }
 
    public:
     read_some() = default;
@@ -52,6 +46,11 @@ class read_some : public mixin::Resumable<read_some<Protocol>> {
     read_some(socket_type& socket, std::span<char> buffer) noexcept
       : socket(socket), buffer(buffer) {}
 
+    constexpr bool await_ready() noexcept { return false; }
+    void await_suspend(std::coroutine_handle<> h) {
+        socket.async_read_some(
+            asio::mutable_buffer(buffer.data(), buffer.size()), get_handler(h));
+    }
     partial_read_result await_resume() {
         return {*status, std::string_view(buffer.data(), buffer.size())};
     }

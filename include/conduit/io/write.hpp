@@ -1,7 +1,6 @@
 #pragma once
 #include <conduit/io/responses.hpp>
 #include <conduit/async/callback.hpp>
-#include <conduit/mixin/resumable.hpp>
 
 #include <boost/asio/basic_socket.hpp>
 #include <boost/asio/ip/tcp.hpp>
@@ -16,7 +15,7 @@ using boost::asio::ip::tcp;
 namespace asio = boost::asio;
 
 template <class Socket>
-class write : public mixin::Resumable<write<Socket>> {
+class write {
     std::string_view message;
     Socket& socket;
     error_code const* status;
@@ -29,10 +28,6 @@ class write : public mixin::Resumable<write<Socket>> {
             caller.resume();
         };
     }
-    void on_suspend(std::coroutine_handle<> h) {
-        asio::async_write(socket, asio::buffer(message), get_handler(h));
-    }
-    friend class mixin::Resumable<write>;
 
    public:
     write() = default;
@@ -41,6 +36,10 @@ class write : public mixin::Resumable<write<Socket>> {
     write(Socket& socket, std::string_view data)
       : socket(socket), message(data) {}
 
+    constexpr bool await_ready() noexcept { return false; }
+    void await_suspend(std::coroutine_handle<> h) {
+        asio::async_write(socket, asio::buffer(message), get_handler(h));
+    }
     write_result await_resume() { return {*status, message.size()}; }
 }; // namespace conduit::async
 template <class Socket>

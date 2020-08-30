@@ -1,5 +1,6 @@
 #pragma once
-#include <conduit/mixin/resumable.hpp>
+#include <conduit/util/stdlib_coroutine.hpp>
+#include <conduit/async/callback.hpp>
 
 #include <conduit/io/responses.hpp>
 
@@ -18,8 +19,7 @@ template <class... Args>
 class connect;
 
 template <class Protocol, class EndpointSequence>
-struct connect<Protocol, EndpointSequence>
-  : mixin::Resumable<connect<Protocol, EndpointSequence>> {
+struct connect<Protocol, EndpointSequence> {
     using endpoint = typename Protocol::endpoint;
 
     boost::asio::basic_socket<Protocol>& socket;
@@ -34,7 +34,8 @@ struct connect<Protocol, EndpointSequence>
             caller.resume();
         };
     }
-    void on_suspend(std::coroutine_handle<> h) {
+    constexpr bool await_ready() noexcept { return false; }
+    void await_suspend(std::coroutine_handle<> h) {
         boost::asio::async_connect(socket, seq, get_handler(h));
     }
 
