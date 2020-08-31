@@ -21,12 +21,18 @@ using namespace conduit;
 std::thread alt_thread;
 
 int test_count = 0;
-#define RUN_TEST(test)                                                         \
-    {                                                                          \
-        auto coro = test("" #test " succeeded");                               \
-        std::cout << "Running test " << test_count++ << "...\t"                \
-                  << co_await coro << std::endl;                               \
-    }
+#define RUN_TEST(test, name)                                                   \
+    do {                                                                       \
+        if (name == "" || #test == name) {                                     \
+            std::string input = "" #test " succeeded";                         \
+            auto coro = test(input);                                           \
+            auto result = co_await coro;                                       \
+            std::cout << "Running test " << name << "...\t" << result          \
+                      << std::endl;                                            \
+            if (result != input)                                               \
+                std::exit(1);                                                  \
+        }                                                                      \
+    } while (0);
 
 future<std::string> test_coroutine(std::string on_success) {
     auto coro = [&](std::string& result) -> coroutine {
@@ -162,8 +168,7 @@ future<std::string> test_recursive_generator(std::string on_success) {
     co_return std::string(begin(g), end(g));
 }
 
-future<std::string>
-test_resume_on_alternate_thread(std::string on_success) {
+future<std::string> test_resume_on_alternate_thread(std::string on_success) {
     struct move_to_new_thread {
         constexpr bool await_ready() { return false; }
         void await_suspend(std::coroutine_handle<> h) {
@@ -220,24 +225,26 @@ future<std::string> test_task(std::string on_success) {
     co_return result;
 }
 
-coroutine run_tests() {
-    RUN_TEST(test_coroutine);
-    RUN_TEST(test_destroy);
-    RUN_TEST(test_exception_1);
-    RUN_TEST(test_exception_2);
-    RUN_TEST(test_future);
-    RUN_TEST(test_generator);
-    RUN_TEST(test_on_suspend);
-    RUN_TEST(test_recursive_generator);
-    RUN_TEST(test_resume_on_alternate_thread);
-    RUN_TEST(test_source);
-    RUN_TEST(test_suspend_invoke);
-    RUN_TEST(test_task);
+coroutine run_tests(std::string name) {
+    RUN_TEST(test_coroutine, name);
+    RUN_TEST(test_destroy, name);
+    RUN_TEST(test_exception_1, name);
+    RUN_TEST(test_exception_2, name);
+    RUN_TEST(test_future, name);
+    RUN_TEST(test_generator, name);
+    RUN_TEST(test_on_suspend, name);
+    RUN_TEST(test_recursive_generator, name);
+    RUN_TEST(test_resume_on_alternate_thread, name);
+    RUN_TEST(test_source, name);
+    RUN_TEST(test_suspend_invoke, name);
+    RUN_TEST(test_task, name);
 }
 
-int main() {
-    run_tests();
+int main(int argc, char** argv) {
+    if (argc == 2)
+        run_tests(argv[1]);
+    else
+        run_tests("");
     if (alt_thread.joinable())
         alt_thread.join();
-    std::cout << "finished\n";
 }
