@@ -1,6 +1,7 @@
 #pragma once
 #include <conduit/io/responses.hpp>
 #include <conduit/async/callback.hpp>
+#include <conduit/coroutine.hpp>
 
 #include <boost/asio/basic_socket.hpp>
 #include <boost/asio/ip/tcp.hpp>
