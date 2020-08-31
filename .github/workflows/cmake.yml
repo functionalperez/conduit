@@ -73,20 +73,6 @@ jobs:
             install-compiler: "cd $HOME \
               && wget https://github.com/llvm/llvm-project/releases/download/llvmorg-10.0.0/clang+llvm-10.0.0-x86_64-linux-gnu-ubuntu-18.04.tar.xz \
               && tar -xvf clang+llvm-10.0.0-x86_64-linux-gnu-ubuntu-18.04.tar.xz"
-
-          - name: windows-2019-clang-debug
-            os: windows-2019
-            compiler: clang++
-            flags: "-stdlib=libc++"
-            build_type: Debug
-            install-compiler: "echo [Assuming cl exists]"
-
-          - name: windows-2019-clang-release
-            os: windows-2019
-            compiler: clang++
-            flags: "-stdlib=libc++"
-            build_type: Release
-            install-compiler: "echo [Assuming cl exists]"
     steps:
     - uses: actions/checkout@v2
     
