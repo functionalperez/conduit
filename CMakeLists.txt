@@ -6,7 +6,7 @@ add_library(conduit INTERFACE)
 option(CONDUIT_Install "Install CMake targets during install step." ON)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
-if (CMAKE_CXX_COMPILER_ID STREQUAL "MSVC" )
+if (MSVC)
     target_compile_options(conduit INTERFACE "/std:c++latest" "/await" "/EHsc")
 endif()
 
