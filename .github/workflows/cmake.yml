@@ -24,7 +24,9 @@ jobs:
           ubuntu-latest-gcc-10-release,
           ubuntu-latest-clang-10-release,
           ubuntu-latest-clang-10-debug-libc++,
-          ubuntu-latest-clang-10-release-libc++
+          ubuntu-latest-clang-10-release-libc++,
+          windows-2019-cl-debug,
+          windows-2019-cl-release
         ]
 
         include:
@@ -33,35 +35,35 @@ jobs:
             compiler: g++-10
             flags: ""
             build_type: Debug
-            install-compiler: sudo apt install g++-10
+            install_compiler: sudo apt install g++-10
         
           - name: ubuntu-latest-clang-10-debug
             os: ubuntu-latest
             compiler: clang++-10
             flags: ""
             build_type: Debug
-            install-compiler: sudo apt install g++-10 && sudo apt install clang-10
+            install_compiler: sudo apt install g++-10 && sudo apt install clang-10
 
           - name: ubuntu-latest-gcc-10-release
             os: ubuntu-latest
             compiler: g++-10
             flags: ""
             build_type: Release
-            install-compiler: sudo apt install g++-10
+            install_compiler: sudo apt install g++-10
         
           - name: ubuntu-latest-clang-10-release
             os: ubuntu-latest
             compiler: clang++-10
             flags: ""
             build_type: Release
-            install-compiler: sudo apt install g++-10 && sudo apt install clang-10
+            install_compiler: sudo apt install g++-10 && sudo apt install clang-10
 
           - name: ubuntu-latest-clang-10-debug-libc++
             os: ubuntu-latest
             compiler: $HOME/clang+llvm-10.0.0-x86_64-linux-gnu-ubuntu-18.04/bin/clang++
             flags: "-stdlib=libc++"
             build_type: Debug
-            install-compiler: "cd $HOME \
+            install_compiler: "cd $HOME \
               && wget https://github.com/llvm/llvm-project/releases/download/llvmorg-10.0.0/clang+llvm-10.0.0-x86_64-linux-gnu-ubuntu-18.04.tar.xz \
               && tar -xvf clang+llvm-10.0.0-x86_64-linux-gnu-ubuntu-18.04.tar.xz"
 
@@ -70,15 +72,30 @@ jobs:
             compiler: $HOME/clang+llvm-10.0.0-x86_64-linux-gnu-ubuntu-18.04/bin/clang++
             flags: "-stdlib=libc++"
             build_type: Release
-            install-compiler: "cd $HOME \
+            install_compiler: "cd $HOME \
               && wget https://github.com/llvm/llvm-project/releases/download/llvmorg-10.0.0/clang+llvm-10.0.0-x86_64-linux-gnu-ubuntu-18.04.tar.xz \
               && tar -xvf clang+llvm-10.0.0-x86_64-linux-gnu-ubuntu-18.04.tar.xz"
+
+          - name: windows-2019-cl-debug
+            os: windows-2019
+            compiler: cl
+            flags: ""
+            build_type: Debug
+            install_compiler: ""
+
+          - name: windows-2019-cl-release
+            os: windows-2019
+            compiler: cl
+            flags: ""
+            build_type: Release
+            install_compiler: ""
+
     steps:
     - uses: actions/checkout@v2
     
     - name: Configure Build Environment
       shell: bash
-      run: ${{ matrix.install-compiler }}
+      run: ${{ matrix.install_compiler }}
 
     - name: Create Build Environment
       # Some projects don't allow in-source building, so create a separate build directory
@@ -94,6 +111,12 @@ jobs:
       # and build directories, but this is only available with CMake 3.13 and higher.  
       # The CMake binaries on the Github Actions machines are (as of this writing) 3.12
       run: cmake $GITHUB_WORKSPACE -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} -DCMAKE_CXX_COMPILER=${{ matrix.compiler }} -DCMAKE_CXX_FLAGS=${{ matrix.flags }}
+
+    - name: Upload compile_commands.json
+      uses: actions/upload-artifact@v2
+      with:
+        name: "${{matrix.name}} compile_commands.json"
+        path: ${{runner.workspace}}/build/compile_commands.json
 
     - name: Build
       working-directory: ${{runner.workspace}}/build
