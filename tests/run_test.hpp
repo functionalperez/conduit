@@ -16,7 +16,7 @@ std::thread alt_thread;
             auto coro = test(input);                                           \
             auto result = co_await coro;                                       \
             printf("Running test %s...\t", #test);                             \
-            printf("%s", result.data());                                       \
+            printf("%s\n", result.data());                                       \
             if (result != input)                                               \
                 std::exit(1);                                                  \
         }();                                                                   \
