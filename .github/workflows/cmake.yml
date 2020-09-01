@@ -81,7 +81,7 @@ jobs:
             flags: ""
             build_type: Debug
             install_compiler: ""
-            
+
     steps:
     - uses: actions/checkout@v2
     
@@ -103,6 +103,12 @@ jobs:
       # and build directories, but this is only available with CMake 3.13 and higher.  
       # The CMake binaries on the Github Actions machines are (as of this writing) 3.12
       run: cmake $GITHUB_WORKSPACE -DCMAKE_BUILD_TYPE=${{ matrix.build_type }} -DCMAKE_CXX_COMPILER=${{ matrix.compiler }} -DCMAKE_CXX_FLAGS=${{ matrix.flags }}
+
+    - name: Upload compile_commands.json
+      uses: actions/upload-artifact@v2
+      with:
+        name: "${{matrix.name}} compile_commands.json"
+        path: ${{runner.workspace}}/build/compile_commands.json
 
     - name: Build
       working-directory: ${{runner.workspace}}/build
