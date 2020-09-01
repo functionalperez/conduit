@@ -1,39 +1,27 @@
+#pragma once
 #include <conduit/continuation.hpp>
 #include <conduit/fn/bind.hpp>
 #include <conduit/mixin/awaitable_parts.hpp>
 #include <utility>
 
 namespace conduit::async {
-
-template <class F, class Bind>
-struct on_suspend : mixin::AwaitReady<false>, mixin::AwaitResume {
-   private:
-    struct package {
-        [[no_unique_address]] F func;
-        [[no_unique_address]] Bind bind;
-        std::coroutine_handle<> handle = nullptr;
-        void operator()() { bind(func, handle); }
-    };
-
-    mem::linda<package, noop_continuation_size> alloc;
-
-   public:
-    template <class... Args>
-    on_suspend(F const& func, Args&&... args)
-      : alloc{{}, package{func, fn::bind_last(std::forward<Args>(args)...)}} {}
-    template <class... Args>
-    on_suspend(F&& func, Args&&... args)
-      : alloc{{},
-              package{std::move(func),
-                      fn::bind_last(std::forward<Args>(args)...)}} {}
-
-    std::coroutine_handle<> await_suspend(std::coroutine_handle<> caller) {
-        alloc.callback.handle = caller;
-        return noop_continuation(alloc);
-    }
+template <class F>
+struct suspend_invoke {
+    [[no_unique_address]] F on_suspend;
+    constexpr bool await_ready() noexcept { return false; }
+    auto await_suspend(std::coroutine_handle<> h) { return on_suspend(h); }
+    void await_resume() {}
 };
+template<class F>
+suspend_invoke(F) -> suspend_invoke<F>;
 
 template <class F, class... Args>
-on_suspend(F, Args... args) -> on_suspend<F, fn::bind_last_t<Args...>>;
-
+auto on_suspend(F&& f, Args&&... args) {
+    if constexpr (sizeof...(Args) == 0) {
+        return suspend_invoke{std::forward<F>(f)};
+    } else {
+        return suspend_invoke{
+            fn::bind_last(std::forward<F>(f), std::forward<Args>(args)...)};
+    }
+}
 } // namespace conduit::async

@@ -1,13 +1,12 @@
 #pragma once
-#include <concepts>
+#include <conduit/util/concepts.hpp>
 #include <cstddef>
-#include <cstdio>
 
 namespace conduit::mem {
 // clang-format off
 template <class Alloc>
 concept allocator = requires(Alloc a, size_t size, void* pointer) {
-    { a.alloc(size) } -> std::same_as<void*>;
+    { a.alloc(size) } -> same_as<void*>;
     { Alloc::dealloc(pointer, size) };
 };
 // clang-format on
@@ -53,11 +52,9 @@ struct static_callback_allocator {
     }
     static void dealloc(void* addr, size_t size) {
         if (size <= sizeof(buffer)) {
-            puts("Deallocating static");
             self* pointer_to_allocator = (self*)addr;
             pointer_to_allocator->callback();
         } else {
-            puts("Deallocating dynamic");
             constexpr size_t offset = sizeof(self*);
             self* pointer_to_allocator = *(self**)((char*)addr - offset);
             delete[]((char*)addr - offset);

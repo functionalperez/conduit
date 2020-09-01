@@ -17,31 +17,33 @@ struct arg<T&> {
     T& elem;
     T& fwd() { return elem; }
 };
+
 template <class T>
-struct arg<T&&> {
-    [[no_unique_address]] T elem;
-    T&& fwd() { return std::move(elem); }
-};
-template <class T>
-arg(T) -> arg<T>;
+arg(T &&) -> arg<T>;
 template <class T>
 arg(T&) -> arg<T&>;
 
-template <class... T>
-auto bind_last(T&&... last) {
-    return
-        [... last_ = arg{forward<T>(last)}](auto&& f, auto&&... first) mutable {
-            return forward<decltype(f)>(f)(forward<decltype(first)>(first)...,
-                                           last_.fwd()...);
+template <class F, class... T>
+auto bind_last(F&& func, T&&... last) {
+    if constexpr (sizeof...(T) == 0) {
+        return std::forward<F>(func);
+    } else {
+        return [f = forward<F>(func),
+                ... last_ = arg{forward<T>(last)}](auto&&... first) mutable {
+            return f(forward<decltype(first)>(first)..., last_.fwd()...);
         };
+    }
 }
-template <class... T>
-auto bind_first(T&&... first) {
-    return [... first_ = arg{forward<T>(first)}](auto&& f,
-                                                 auto&&... last) mutable {
-        return forward<decltype(f)>(f)(first_.fwd()...,
-                                       forward<decltype(last)>(last)...);
-    };
+template <class F, class... T>
+auto bind_first(F&& func, T&&... first) {
+    if constexpr (sizeof...(T) == 0) {
+        return std::forward<F>(func);
+    } else {
+        return [f = forward<F>(func),
+                ... first_ = arg{forward<T>(first)}](auto&&... last) mutable {
+            return f(first_.fwd()..., forward<decltype(last)>(last)...);
+        };
+    }
 }
 
 template <class... T>

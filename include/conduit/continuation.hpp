@@ -1,8 +1,19 @@
 #pragma once
-#include <conduit/promise/continuation.hpp>
+#include <conduit/mem/allocator.hpp>
+#include <conduit/mixin/promise_parts.hpp>
+
+namespace conduit::promise {
+template <class Alloc>
+struct continuation : mixin::GetReturnObject<continuation<Alloc>, false>,
+                      mixin::UnhandledException<continuation<Alloc>>,
+                      mixin::InitialSuspend<mixin::always>,
+                      mixin::FinalSuspend<mixin::never>,
+                      mixin::ReturnVoid,
+                      mixin::NewAndDelete<Alloc> {};
+} // namespace conduit::promise
 
 namespace conduit {
-template <mem::allocator Alloc>
+template <class Alloc>
 struct continuation : std::coroutine_handle<promise::continuation<Alloc>> {
     using promise_type = promise::continuation<Alloc>;
     using super = std::coroutine_handle<promise_type>;
@@ -20,7 +31,7 @@ compiler error in gcc
 #endif
 };
 
-template <mem::allocator Alloc>
+template <class Alloc>
 continuation<Alloc> noop_continuation(Alloc* alloc) {
     co_return;
 }

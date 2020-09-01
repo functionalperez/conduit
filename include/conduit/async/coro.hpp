@@ -1,10 +1,10 @@
 #pragma once
-#include <conduit/concepts.hpp>
 #include <conduit/async/on_coro.hpp>
+#include <conduit/util/concepts.hpp>
 #include <cstddef>
 
 namespace conduit::async {
-template <class Promise>
+template <co_promise Promise>
 class coro {
     std::coroutine_handle<Promise> handle = nullptr;
     std::coroutine_handle<Promise> release() {
@@ -21,7 +21,7 @@ class coro {
     coro(coro const&) = delete;
     constexpr coro(std::nullptr_t) noexcept : coro() {}
     coro(std::coroutine_handle<Promise> h) noexcept : handle(h) {
-        if(handle) {
+        if (handle) {
             handle.promise().set_owner(&handle);
         }
     }
@@ -44,15 +44,22 @@ class coro {
             handle.promise().set_owner(&other.handle);
     }
 
+    // awaits on the given coroutine
     auto operator co_await() & noexcept {
         return on_coro<Promise, false>{handle};
     }
+
+#if defined(__GNUC__) && !defined(__clang__)
+    // co_awaiting directly on a newly created coroutine causes a memory leak in
+    // gcc
+    auto operator co_await() && noexcept = delete;
+#else
+    // awaits on the given coroutine
     auto operator co_await() && noexcept {
         return on_coro<Promise, true>{handle};
     }
-    bool done() const {
-        return handle.done();
-    }
+#endif
+    bool done() const { return handle.done(); }
 
     ~coro() {
         if (handle) {
