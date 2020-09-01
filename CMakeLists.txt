@@ -37,26 +37,17 @@ if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
 endif()
 
 if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME AND BUILD_TESTING)
-    add_executable(run_tests tests/tests.cpp)
     set(THREADS_PREFER_PTHREAD_FLAG ON)
     find_package(Threads REQUIRED)
-    target_link_libraries(run_tests PRIVATE conduit)
-    target_link_libraries(run_tests PRIVATE Threads::Threads)
+    
+    file(GLOB all_tests "tests/*.cpp")
 
-    foreach(X IN ITEMS 
-        test_coroutine
-        test_destroy
-        test_exception_1
-        test_exception_2
-        test_future
-        test_generator
-        test_on_suspend
-        test_recursive_generator
-        test_resume_on_alternate_thread
-        test_source
-        test_suspend_invoke
-        test_task)
-        add_test(NAME "${X}" COMMAND run_tests "${X}")
+    foreach(file_name ${all_tests})
+        get_filename_component(test_name ${file_name} NAME_WE)
+        add_executable("${test_name}" "${file_name}")
+        target_link_libraries("${test_name}" PRIVATE conduit)
+        target_link_libraries("${test_name}" PRIVATE Threads::Threads)
+        add_test(NAME "${test_name}" COMMAND "${test_name}")
     endforeach()
 endif()
 
