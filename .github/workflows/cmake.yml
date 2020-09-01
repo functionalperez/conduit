@@ -25,7 +25,8 @@ jobs:
           ubuntu-latest-clang-10-release,
           ubuntu-latest-clang-10-debug-libc++,
           ubuntu-latest-clang-10-release-libc++,
-          windows-2019-cl-debug
+          windows-2019-cl-debug,
+          windows-2019-cl-release
         ]
 
         include:
@@ -74,12 +75,19 @@ jobs:
             install_compiler: "cd $HOME \
               && wget https://github.com/llvm/llvm-project/releases/download/llvmorg-10.0.0/clang+llvm-10.0.0-x86_64-linux-gnu-ubuntu-18.04.tar.xz \
               && tar -xvf clang+llvm-10.0.0-x86_64-linux-gnu-ubuntu-18.04.tar.xz"
-          
+
           - name: windows-2019-cl-debug
             os: windows-2019
             compiler: cl
             flags: ""
             build_type: Debug
+            install_compiler: ""
+
+          - name: windows-2019-cl-release
+            os: windows-2019
+            compiler: cl
+            flags: ""
+            build_type: Release
             install_compiler: ""
 
     steps:
