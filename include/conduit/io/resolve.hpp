@@ -1,7 +1,6 @@
 #pragma once
 
 #include <conduit/async/callback.hpp>
-#include <conduit/mixin/resumable.hpp>
 
 #include <conduit/io/responses.hpp>
 
@@ -16,13 +15,7 @@ template <class...>
 struct resolve;
 
 template <class Protocol, class Executor>
-class resolve<boost::asio::ip::basic_resolver<Protocol, Executor>>
-  : mixin::Resumable<
-        resolve<boost::asio::ip::basic_resolver<Protocol, Executor>>> {
-    using super = mixin::Resumable<
-        resolve<boost::asio::ip::basic_resolver<Protocol, Executor>>>;
-    friend class mixin::Resumable<
-        resolve<boost::asio::ip::basic_resolver<Protocol, Executor>>>;
+class resolve<boost::asio::ip::basic_resolver<Protocol, Executor>> {
 
     using resolver = boost::asio::ip::basic_resolver<Protocol, Executor>;
     using endpoint_list = typename resolver::results_type;
@@ -40,16 +33,15 @@ class resolve<boost::asio::ip::basic_resolver<Protocol, Executor>>
             caller.resume();
         };
     }
-    void on_suspend(std::coroutine_handle<> h) {
-        r.async_resolve(host, service, get_handler(h));
-    }
 
    public:
     resolve(resolver& r, std::string_view host, std::string_view service)
       : r(r), host(host), service(service) {}
 
-    using super::await_ready;
-    using super::await_suspend;
+    constexpr bool await_ready() noexcept { return false; }
+    void await_suspend(std::coroutine_handle<> h) {
+        r.async_resolve(host, service, get_handler(h));
+    }
     auto await_resume() {
         return resolve_result{*ec_ptr, std::move(endpoints)};
     }

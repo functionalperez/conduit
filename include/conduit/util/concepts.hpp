@@ -50,10 +50,9 @@ concept co_promise = requires(Promise p) {
 };
 
 template<class Result>
-concept co_result = co_promise<promise_t<Result>> 
-    && requires(promise_t<Result> p) {
-    { Result{p.get_return_object()} } -> same_as<Result>;
-};
+concept co_result = requires { typename Result::promise_type; } 
+    && co_promise<typename Result::promise_type>
+    && requires(promise_t<Result> p) { Result{p.get_return_object()}; };
 
 template <class Promise, class Result>
 concept return_object_aware = requires(Promise promise, Result* r) {

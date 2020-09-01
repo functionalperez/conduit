@@ -15,8 +15,6 @@ struct unique_handle : private std::coroutine_handle<Promise> {
    public:
     constexpr static bool is_return_object_aware =
         return_object_aware<Promise, unique_handle>;
-    // Checks if the promise is noexcept
-    constexpr static bool is_noexcept = Promise::is_noexcept;
     // This is used by the compiler to generate the coroutine frame
     using promise_type = Promise;
     // unique_handle inherits from super
