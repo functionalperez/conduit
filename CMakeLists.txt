@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.0.0)
-project(conduit VERSION 0.3.0 LANGUAGES CXX)
+project(conduit CXX)
 
 add_library(conduit INTERFACE)
 
