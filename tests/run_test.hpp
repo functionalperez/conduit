@@ -24,3 +24,5 @@ std::thread alt_thread;
             alt_thread.join();                                                 \
         return 0;                                                              \
     }
+
+#define FAIL_TEST int main() { return 1; }
