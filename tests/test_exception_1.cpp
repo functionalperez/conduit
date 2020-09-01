@@ -1,4 +1,5 @@
 #include "run_test.hpp"
+#include <stdexcept>
 
 future<std::string> test_exception_1(std::string on_success) {
     auto coro = [](const char* what) -> coroutine {

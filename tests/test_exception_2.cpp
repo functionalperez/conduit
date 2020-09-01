@@ -1,4 +1,5 @@
 #include "run_test.hpp"
+#include <stdexcept>
 
 template <class F>
 class invoke_on_destroy {
