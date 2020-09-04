@@ -40,7 +40,7 @@ if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME AND BUILD_TESTING)
     set(THREADS_PREFER_PTHREAD_FLAG ON)
     find_package(Threads REQUIRED)
     
-    file(GLOB all_tests "tests/*.cpp")
+    file(GLOB all_tests "test/*.cpp")
 
     foreach(file_name ${all_tests})
         get_filename_component(test_name ${file_name} NAME_WE)
