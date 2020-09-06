@@ -11,7 +11,7 @@ template <class A, class B>
 concept same_as = std::is_same_v<A, B> && std::is_same_v<B, A>;
 
 template <class From, class To>
-concept convertible_to = std::is_convertible_v<From, To> 
+concept convertible_to = std::is_convertible_v<From, To>
     && requires(std::add_rvalue_reference_t<From> (&f)()) {
     static_cast<To>(f());
 };
@@ -50,7 +50,7 @@ concept co_promise = requires(Promise p) {
 };
 
 template<class Result>
-concept co_result = requires { typename Result::promise_type; } 
+concept co_result = requires { typename Result::promise_type; }
     && co_promise<typename Result::promise_type>
     && requires(promise_t<Result> p) { Result{p.get_return_object()}; };
 
@@ -60,13 +60,13 @@ concept return_object_aware = requires(Promise promise, Result* r) {
 };
 
 template <class Promise>
-concept value_producing_promise = co_promise<Promise> 
+concept value_producing_promise = co_promise<Promise>
     && requires(Promise p) {
-    { p.get_value() } -> non_void;
+    { p.get_value() };
 };
 
 template <class Result, class Value>
-concept can_co_return = co_result<Result> 
+concept can_co_return = co_result<Result>
     && requires(promise_t<Result> p, Value v) {
     { p.return_value(v) } -> same_as<void>;
 };
