@@ -1,7 +1,7 @@
 #include "run_test.hpp"
 #include <stdexcept>
 
-future<std::string> test_exception_1(std::string on_success) {
+future<std::string> test_coroutine_except_1(std::string on_success) {
     auto coro = [](const char* what) -> coroutine {
         throw std::logic_error(what);
         co_return;
@@ -9,11 +9,11 @@ future<std::string> test_exception_1(std::string on_success) {
 
     try {
         coro(on_success.data());
-        co_return "Failed test_exception_1: exception not thrown";
+        co_return "Failed test_coroutine_except_1: exception not thrown";
     } catch (std::exception& ex) {
         co_return ex.what();
     }
-    co_return "Failed test_exception_1: exception not caught";
+    co_return "Failed test_coroutine_except_1: exception not caught";
 }
 
-RUN_CORO_TEST(test_exception_1)
+RUN_CORO_TEST(test_coroutine_except_1)

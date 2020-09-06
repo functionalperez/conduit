@@ -25,21 +25,22 @@ class invoke_on_destroy {
 };
 template <class F>
 invoke_on_destroy(F) -> invoke_on_destroy<F>;
+future<std::string> test_coroutine_except_2(std::string on_success) {
 
-future<std::string> test_exception_4(std::string on_success) {
-    std::string result = "Result not set";
-    auto coro = [](auto guard) -> coroutine {
-        throw std::logic_error("blarg");
+    auto coro = [&](auto arg) -> coroutine {
+        throw std::logic_error("Some error");
         co_return;
     };
 
+    std::string result = "Result not set";
+    auto action = [&]() { result = std::move(on_success); };
     try {
-        coro(invoke_on_destroy([&]() { result = on_success; }));
-        co_return "Failed test_exception_4: exception not thrown";
-    } catch (std::exception& ex) {
+        coro(invoke_on_destroy(action));
+        co_return "Failed test_coroutine_except_2: exception not caught";
+    } catch (std::logic_error& err) {
         co_return result;
     }
-    co_return "Failed test_exception_4: exception not caught";
+    co_return "Failed test_coroutine_except_2: exception not caught";
 }
 
-RUN_CORO_TEST(test_exception_4)
+RUN_CORO_TEST(test_coroutine_except_2)

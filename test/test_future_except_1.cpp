@@ -7,7 +7,7 @@ future<int> test_future_ex(std::string what) {
     co_return 42;
 }
 
-future<std::string> test_exception_3(std::string on_success) {
+future<std::string> test_future_except_1(std::string on_success) {
     try {
         auto coro = test_future_ex(on_success);
         auto val = co_await coro;
@@ -17,4 +17,4 @@ future<std::string> test_exception_3(std::string on_success) {
     }
 }
 
-RUN_CORO_TEST(test_exception_3);
+RUN_CORO_TEST(test_future_except_1);
