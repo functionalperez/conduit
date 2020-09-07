@@ -20,7 +20,7 @@ struct source : mixin::HasOwnerAndCallback,
         pointer = nullptr;
         exception = std::current_exception();
     }
-    constexpr auto get_value() & noexcept -> optional_ref<ReturnValue const> {
+    constexpr auto get_value() & -> optional_ref<ReturnValue const> {
         if (pointer)
             return {pointer};
         else if (exception) {
@@ -29,7 +29,7 @@ struct source : mixin::HasOwnerAndCallback,
             return {nullptr};
         }
     }
-    constexpr auto get_value() && noexcept -> std::optional<ReturnValue> {
+    constexpr auto get_value() && -> std::optional<ReturnValue> {
         if (pointer)
             return {*pointer};
         else if (exception) {
