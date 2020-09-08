@@ -3,22 +3,37 @@
 #include <conduit/mixin/awaitable_parts.hpp>
 #include <conduit/mixin/promise_parts.hpp>
 #include <conduit/util/optional_ref.hpp>
+#include <stdexcept>
 
 #include <optional>
 
 namespace conduit::promise {
 template <class ReturnValue>
 struct source : mixin::HasOwnerAndCallback,
-                mixin::GetReturnObject<source<ReturnValue>>,
-                mixin::UnhandledException<source<ReturnValue>> {
+                mixin::GetReturnObject<source<ReturnValue>> {
    private:
     ReturnValue const* pointer = nullptr;
+    std::exception_ptr exception = nullptr;
 
    public:
-    constexpr auto get_value() & noexcept { return optional_ref{pointer}; }
-    constexpr auto get_value() && noexcept -> std::optional<ReturnValue> {
-        if (pointer) {
-            return std::optional<ReturnValue>{*pointer};
+    void unhandled_exception() noexcept {
+        pointer = nullptr;
+        exception = std::current_exception();
+    }
+    constexpr auto get_value() & -> optional_ref<ReturnValue const> {
+        if (pointer)
+            return {pointer};
+        else if (exception) {
+            std::rethrow_exception(exception);
+        } else {
+            return {nullptr};
+        }
+    }
+    constexpr auto get_value() && -> std::optional<ReturnValue> {
+        if (pointer)
+            return {*pointer};
+        else if (exception) {
+            std::rethrow_exception(exception);
         } else {
             return std::nullopt;
         }
