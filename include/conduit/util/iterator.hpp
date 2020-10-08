@@ -38,9 +38,9 @@ struct coro_iterator {
     // Returns true iff the coroutine is not done
     bool operator!=(coro_sentinal) const noexcept { return !coro.done(); }
 
-    bool operator==(coro_iterator) const noexcept { return coro.done(); }
+    bool operator==(coro_iterator const&) const noexcept { return coro.done(); }
     // Returns true iff the coroutine is not done
-    bool operator!=(coro_iterator) const noexcept { return !coro.done(); }
+    bool operator!=(coro_iterator const&) const noexcept { return !coro.done(); }
 
     using difference_type = std::ptrdiff_t;
     using iterator_category = std::input_iterator_tag;
