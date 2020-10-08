@@ -30,11 +30,7 @@ struct coro_iterator {
     // Calls deref on the coroutine handle and returns the result
     // By default, this returns coro.promise().current_value;
     auto const& operator*() const noexcept {
-        if constexpr (has_value_member<promise_type>)
-            return coro.promise().value;
-        else {
-            return coro.promise().get_value();
-        }
+        return coro.promise().get_value();
     }
 
     // Returns true iff the coroutine is done
