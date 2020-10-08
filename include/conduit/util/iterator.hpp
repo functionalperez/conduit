@@ -1,4 +1,5 @@
 #pragma once
+#include <conduit/util/concepts.hpp>
 #include <conduit/util/stdlib_coroutine.hpp>
 #include <iterator>
 
@@ -16,7 +17,13 @@ struct coro_iterator {
 
     // Calls deref on the coroutine handle and returns the result
     // By default, this returns coro.promise().current_value;
-    decltype(auto) operator*() noexcept { return coro.promise().get_value(); }
+    auto const& operator*() noexcept {
+        if constexpr (has_value_member<promise_type>)
+            return coro.promise().value;
+        else {
+            return coro.promise().get_value();
+        }
+    }
 
     // Returns true iff the coroutine is done
     bool operator==(coro_sentinal) const noexcept { return coro.done(); }
@@ -28,8 +35,9 @@ struct coro_iterator {
     bool operator!=(coro_iterator) const noexcept { return !coro.done(); }
 
     using iterator_category = std::input_iterator_tag;
-    using value_type =
-        std::remove_reference_t<decltype(coro.promise().get_value())>;
+
+    using promise_type = std::decay_t<decltype(coro.promise())>;
+    using value_type = std::decay_t<decltype(*std::declval<coro_iterator>())>;
     using pointer = value_type const*;
     using reference = value_type const&;
     using difference_type = std::ptrdiff_t;

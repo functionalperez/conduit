@@ -14,10 +14,10 @@ struct on_coro {
         return handle;
     }
     bool await_resume() noexcept { return !handle.done(); }
-    auto await_resume() requires(value_producing_promise<P> && !move_value) {
+    auto await_resume() requires(has_get_value_member<P> && !move_value) {
         return handle.promise().get_value();
     }
-    auto await_resume() requires(value_producing_promise<P>&& move_value) {
+    auto await_resume() requires(has_get_value_member<P>&& move_value) {
         return std::move(handle.promise()).get_value();
     }
 };
