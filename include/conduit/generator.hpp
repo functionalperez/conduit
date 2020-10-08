@@ -2,6 +2,7 @@
 #include <conduit/mixin/promise_parts.hpp>
 #include <conduit/util/iterator.hpp>
 #include <conduit/util/unique_handle.hpp>
+#include <memory>
 
 namespace conduit::promise {
 template <class T>
@@ -9,22 +10,33 @@ struct generator
   : mixin::GetReturnObject<generator<T>>
   , mixin::InitialSuspend<false>
   , mixin::FinalSuspend<true>
-  , mixin::UnhandledException<generator<T>>
   , mixin::ReturnVoid {
    public:
-    T value;
+    constexpr static bool is_reference = std::is_reference_v<T>;
+    using value_type = std::remove_reference_t<T>;
+    using pointer = value_type*;
+    using reference_type = value_type&;
     // Stores value in this->value, to be accessed by the caller via
     // coroutine_handle.promise().value
-    constexpr auto
-    yield_value(T const& v) noexcept(std::is_nothrow_copy_assignable_v<T>) {
-        value = v;
+    constexpr auto yield_value(T& v) noexcept {
+        value_pointer = std::addressof(v);
         return std::suspend_always {};
     }
-    constexpr auto
-    yield_value(T&& v) noexcept(std::is_nothrow_move_assignable_v<T>) {
-        value = std::move(v);
+    constexpr auto yield_value(T&& v) noexcept {
+        value_pointer = std::addressof(v);
         return std::suspend_always {};
     }
+
+    void unhandled_exception() const {
+        std::rethrow_exception(std::current_exception());
+    }
+
+    reference_type get_value() const noexcept {
+        return *value_pointer;
+    }
+
+   private:
+    pointer value_pointer;
 };
 } // namespace conduit::promise
 
