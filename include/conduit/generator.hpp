@@ -27,15 +27,19 @@ struct generator
         return std::suspend_always {};
     }
 
-    void unhandled_exception() const {
-        std::rethrow_exception(std::current_exception());
+    void unhandled_exception() noexcept {
+        exception_pointer = std::current_exception();
     }
 
-    reference_type get_value() const noexcept {
-        return *value_pointer;
+    reference_type get_value() const noexcept { return *value_pointer; }
+
+    void rethrow_if_exception() {
+        if (exception_pointer)
+            std::rethrow_exception(exception_pointer);
     }
 
    private:
+    std::exception_ptr exception_pointer = nullptr;
     pointer value_pointer;
 };
 } // namespace conduit::promise
@@ -51,12 +55,15 @@ struct generator : unique_handle<promise::generator<T>> {
 template <class T>
 auto begin(generator<T>& g)
     -> coro_iterator<std::coroutine_handle<promise::generator<T>>> {
-    return {g.promise()};
+    if (g.done()) {
+        g.promise().rethrow_if_exception();
+    }
+    return {g.get()};
 }
 template <class T>
 auto end(generator<T>& g)
     -> coro_iterator<std::coroutine_handle<promise::generator<T>>> {
-    return {g.promise()};
+    return {g.get()};
 }
 
 template <class T>
