@@ -24,6 +24,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+#include <conduit/util/iterator.hpp>
 #include <conduit/util/stdlib_coroutine.hpp>
 #include <exception>
 #include <functional>
@@ -85,79 +86,11 @@ class generator {
 };
 } // namespace promise
 
-namespace detail {
-struct generator_sentinel {};
-
-template <typename T>
-class generator_iterator {
-    using coroutine_handle = std::coroutine_handle<promise::generator<T>>;
-
-   public:
-    using iterator_category = std::input_iterator_tag;
-    // What type should we use for counting elements of a potentially infinite
-    // sequence?
-    using difference_type = std::ptrdiff_t;
-    using value_type = typename promise::generator<T>::value_type;
-    using reference = typename promise::generator<T>::reference_type;
-    using pointer = typename promise::generator<T>::pointer_type;
-
-    // Iterator needs to be default-constructible to satisfy the Range concept.
-    generator_iterator() = default;
-    generator_iterator(const generator_iterator&) = default;
-    generator_iterator(coroutine_handle coroutine) noexcept
-      : coro(coroutine) {}
-
-    bool operator==(const generator_iterator&) const noexcept {
-        return coro || coro.done();
-    }
-    bool operator!=(const generator_iterator&) const noexcept {
-        return coro && !coro.done();
-    }
-
-    bool operator==(generator_sentinel) const noexcept {
-        return !coro || coro.done();
-    }
-
-    bool operator!=(generator_sentinel) noexcept {
-        return coro && !coro.done();
-    }
-
-    friend bool
-    operator==(generator_sentinel s, const generator_iterator& it) noexcept {
-        return it == s;
-    }
-
-    friend bool
-    operator!=(generator_sentinel s, const generator_iterator& it) noexcept {
-        return it != s;
-    }
-
-    generator_iterator& operator++() {
-        coro.resume();
-        if (coro.done()) {
-            coro.promise().rethrow_if_exception();
-        }
-
-        return *this;
-    }
-
-    // Need to provide post-increment operator to implement the 'Range' concept.
-    void operator++(int) { (void)operator++(); }
-
-    reference operator*() const noexcept { return coro.promise().value(); }
-
-    pointer operator->() const noexcept { return std::addressof(operator*()); }
-
-   private:
-    coroutine_handle coro;
-};
-} // namespace detail
-
 template <typename T>
 class [[nodiscard]] generator {
    public:
     using promise_type = promise::generator<T>;
-    using iterator = detail::generator_iterator<T>;
+    using iterator = coro_iterator<std::coroutine_handle<promise_type>>;
 
     generator() = default;
 
@@ -193,9 +126,7 @@ class [[nodiscard]] generator {
         return iterator {m_coroutine};
     }
 
-    detail::generator_sentinel end() noexcept {
-        return detail::generator_sentinel {};
-    }
+    coro_sentinel end() noexcept { return {}; }
 
     void swap(generator & other) noexcept {
         std::swap(m_coroutine, other.m_coroutine);
@@ -224,6 +155,6 @@ auto begin(generator<T>& gen) {
 }
 template <class T>
 auto end(generator<T>& gen) {
-    return detail::generator_iterator<T> {};
+    return typename generator<T>::iterator {};
 }
 } // namespace conduit
