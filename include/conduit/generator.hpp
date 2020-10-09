@@ -126,7 +126,7 @@ class [[nodiscard]] generator {
         return iterator {m_coroutine};
     }
 
-    coro_sentinel end() noexcept { return {}; }
+    iterator end() noexcept { return {}; }
 
     void swap(generator & other) noexcept {
         std::swap(m_coroutine, other.m_coroutine);
@@ -155,6 +155,6 @@ auto begin(generator<T>& gen) {
 }
 template <class T>
 auto end(generator<T>& gen) {
-    return typename generator<T>::iterator {};
+    return gen.end();
 }
 } // namespace conduit
