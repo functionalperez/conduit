@@ -165,10 +165,11 @@ class HasOwnerAndCallback : public mixin::InitialSuspend<true> {
 
 class ExceptionHandler {
     std::exception_ptr exception_ptr;
+    constexpr static bool unhandled_noexcept =
+        std::is_nothrow_copy_assignable_v<std::exception_ptr>;
 
    public:
-    void unhandled_exception() noexcept(
-        std::is_nothrow_copy_assignable_v<std::exception_ptr>) {
+    void unhandled_exception() noexcept(unhandled_noexcept) {
         exception_ptr = std::current_exception();
     }
     void rethrow_if_exception() const {
@@ -196,5 +197,11 @@ class YieldValue {
     }
 
     reference_type value() const noexcept { return *value_ptr; }
+};
+
+// Protects incorrect co_await operations by deleting await_transform
+struct DisableCoAwait {
+    template <typename U>
+    std::suspend_never await_transform(U&& value) = delete;
 };
 } // namespace conduit::mixin

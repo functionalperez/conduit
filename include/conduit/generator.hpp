@@ -44,7 +44,8 @@ class generator
   , public mixin::FinalSuspend<true>
   , public mixin::ExceptionHandler
   , public mixin::ReturnVoid
-  , public mixin::YieldValue<T> {
+  , public mixin::YieldValue<T>
+  , public mixin::DisableCoAwait {
    public:
     using coroutine_handle = std::coroutine_handle<generator>;
     using value_type = typename mixin::YieldValue<T>::value_type;
@@ -56,10 +57,6 @@ class generator
     auto get_return_object() noexcept {
         return coroutine_handle::from_promise(*this);
     }
-
-    // Don't allow any use of 'co_await' inside the generator coroutine.
-    template <typename U>
-    std::suspend_never await_transform(U&& value) = delete;
 };
 } // namespace promise
 
@@ -68,6 +65,7 @@ class [[nodiscard]] generator {
    public:
     using promise_type = promise::generator<T>;
     using iterator = coro_iterator<std::coroutine_handle<promise_type>>;
+    using self = generator<T>;
 
     generator() = default;
     generator(generator && other) noexcept
@@ -104,9 +102,7 @@ class [[nodiscard]] generator {
 
     iterator end() noexcept { return {}; }
 
-    void swap(generator & other) noexcept {
-        std::swap(coro, other.m_coroutine);
-    }
+    void swap(self & other) noexcept { std::swap(coro, other.coro); }
 
     std::coroutine_handle<promise_type> coro = nullptr;
 };
@@ -114,15 +110,6 @@ class [[nodiscard]] generator {
 template <typename T>
 void swap(generator<T>& a, generator<T>& b) {
     a.swap(b);
-}
-
-template <typename FUNC, typename T>
-generator<
-    std::invoke_result_t<FUNC&, typename generator<T>::iterator::reference>>
-fmap(FUNC func, generator<T> source) {
-    for (auto&& value : source) {
-        co_yield std::invoke(func, static_cast<decltype(value)>(value));
-    }
 }
 
 template <class T>
