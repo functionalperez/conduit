@@ -64,6 +64,7 @@ class generator
 template <typename T>
 class [[nodiscard]] generator : unique_handle<promise::generator<T>> {
     using super = unique_handle<promise::generator<T>>;
+
    public:
     using promise_type = promise::generator<T>;
     using iterator = coro_iterator<std::coroutine_handle<promise_type>>;
@@ -80,10 +81,8 @@ class [[nodiscard]] generator : unique_handle<promise::generator<T>> {
 
     iterator begin() const {
         auto coro = super::get();
-        if (coro) {
-            if (coro.done()) {
-                coro.promise().rethrow_if_exception();
-            }
+        if (coro && coro.done()) {
+            coro.promise().rethrow_if_exception();
         }
 
         return iterator {coro};
