@@ -24,9 +24,9 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+#include <conduit/mixin/promise_parts.hpp>
 #include <conduit/util/iterator.hpp>
 #include <conduit/util/stdlib_coroutine.hpp>
-#include <conduit/mixin/promise_parts.hpp>
 #include <exception>
 #include <functional>
 #include <iterator>
@@ -39,7 +39,10 @@ class generator;
 
 namespace promise {
 template <typename T>
-class generator : public mixin::InitialSuspend<true> {
+class generator
+  : public mixin::InitialSuspend<true>
+  , public mixin::FinalSuspend<true>
+  , public mixin::GetReturnObject<generator<T>> {
    public:
     using value_type = std::remove_reference_t<T>;
     using reference_type =
@@ -53,11 +56,6 @@ class generator : public mixin::InitialSuspend<true> {
 
    public:
     generator() = default;
-
-    auto get_return_object() noexcept {
-        return coroutine_handle::from_promise(*this);
-    }
-    constexpr std::suspend_always final_suspend() const noexcept { return {}; }
 
     std::suspend_always yield_value(reference_type value) noexcept {
         value_ptr = std::addressof(value);
