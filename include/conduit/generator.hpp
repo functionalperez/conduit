@@ -70,6 +70,9 @@ class [[nodiscard]] generator : unique_handle<promise::generator<T>> {
     using iterator = coro_iterator<std::coroutine_handle<promise_type>>;
 
     using super::super;
+    using super::done;
+    using super::promise;
+    using super::get;
     generator() = default;
     generator(generator &&) = default;
     generator(const generator& other) = delete;
@@ -80,12 +83,11 @@ class [[nodiscard]] generator : unique_handle<promise::generator<T>> {
     }
 
     iterator begin() const {
-        auto coro = super::get();
-        if (coro && coro.done()) {
-            coro.promise().rethrow_if_exception();
+        if (done()) {
+            promise().rethrow_if_exception();
         }
 
-        return iterator {coro};
+        return iterator {get()};
     }
 
     iterator end() const noexcept { return {}; }

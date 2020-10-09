@@ -105,7 +105,7 @@ class coro_iterator<std::coroutine_handle<Promise>> {
 
     reference operator*() const noexcept { return coro.promise().value(); }
 
-    pointer operator->() const noexcept { return std::addressof(operator*()); }
+    pointer operator->() const noexcept { return std::addressof(coro.promise().value()); }
 
    private:
     coroutine_handle coro;
