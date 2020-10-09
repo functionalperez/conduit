@@ -41,8 +41,7 @@ namespace promise {
 template <typename T>
 class generator
   : public mixin::InitialSuspend<true>
-  , public mixin::FinalSuspend<true>
-  , public mixin::GetReturnObject<generator<T>> {
+  , public mixin::FinalSuspend<true> {
    public:
     using value_type = std::remove_reference_t<T>;
     using reference_type =
@@ -56,6 +55,10 @@ class generator
 
    public:
     generator() = default;
+
+    auto get_return_object() noexcept {
+        return coroutine_handle::from_promise(*this);
+    }
 
     std::suspend_always yield_value(reference_type value) noexcept {
         value_ptr = std::addressof(value);
