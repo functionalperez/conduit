@@ -41,7 +41,7 @@ class generator;
 namespace promise {
 template <typename T>
 class generator
-  : public mixin::InitialSuspend<false>
+  : public mixin::InitialSuspend<true>
   , public mixin::FinalSuspend<true>
   , public mixin::ExceptionHandler
   , public mixin::ReturnVoid
@@ -69,10 +69,10 @@ class [[nodiscard]] generator : unique_handle<promise::generator<T>> {
     using promise_type = promise::generator<T>;
     using iterator = coro_iterator<std::coroutine_handle<promise_type>>;
 
-    using super::super;
     using super::done;
-    using super::promise;
     using super::get;
+    using super::promise;
+    using super::super;
     generator() = default;
     generator(generator &&) = default;
     generator(const generator& other) = delete;
@@ -83,11 +83,15 @@ class [[nodiscard]] generator : unique_handle<promise::generator<T>> {
     }
 
     iterator begin() const {
-        if (done()) {
-            promise().rethrow_if_exception();
+        const auto coro = get();
+        if (coro) {
+            coro.resume();
+            if (coro.done()) {
+                coro.promise().rethrow_if_exception();
+            }
         }
 
-        return iterator {get()};
+        return iterator {coro};
     }
 
     iterator end() const noexcept { return {}; }
