@@ -26,6 +26,7 @@
 
 #include <conduit/util/iterator.hpp>
 #include <conduit/util/stdlib_coroutine.hpp>
+#include <conduit/mixin/promise_parts.hpp>
 #include <exception>
 #include <functional>
 #include <iterator>
@@ -38,21 +39,23 @@ class generator;
 
 namespace promise {
 template <typename T>
-class generator {
+class generator : public mixin::InitialSuspend<true> {
    public:
     using value_type = std::remove_reference_t<T>;
     using reference_type =
         std::conditional_t<std::is_reference_v<T>, T, T const&>;
     using pointer_type = std::remove_reference_t<reference_type>*;
+    using coroutine_handle = std::coroutine_handle<generator>;
 
+   private:
+    pointer_type value_ptr;
+    std::exception_ptr exception_ptr;
+
+   public:
     generator() = default;
 
     auto get_return_object() noexcept {
-        return std::coroutine_handle<generator<T>>::from_promise(*this);
-    }
-
-    constexpr std::suspend_always initial_suspend() const noexcept {
-        return {};
+        return coroutine_handle::from_promise(*this);
     }
     constexpr std::suspend_always final_suspend() const noexcept { return {}; }
 
@@ -79,10 +82,6 @@ class generator {
             std::rethrow_exception(exception_ptr);
         }
     }
-
-   private:
-    pointer_type value_ptr;
-    std::exception_ptr exception_ptr;
 };
 } // namespace promise
 
@@ -93,20 +92,19 @@ class [[nodiscard]] generator {
     using iterator = coro_iterator<std::coroutine_handle<promise_type>>;
 
     generator() = default;
-
     generator(generator && other) noexcept
-      : m_coroutine(other.m_coroutine) {
+      : coro(other.m_coroutine) {
         other.m_coroutine = nullptr;
     }
 
     generator(std::coroutine_handle<promise_type> coroutine) noexcept
-      : m_coroutine(coroutine) {}
+      : coro(coroutine) {}
 
     generator(const generator& other) = delete;
 
     ~generator() {
-        if (m_coroutine) {
-            m_coroutine.destroy();
+        if (coro) {
+            coro.destroy();
         }
     }
 
@@ -116,23 +114,23 @@ class [[nodiscard]] generator {
     }
 
     iterator begin() {
-        if (m_coroutine) {
-            m_coroutine.resume();
-            if (m_coroutine.done()) {
-                m_coroutine.promise().rethrow_if_exception();
+        if (coro) {
+            coro.resume();
+            if (coro.done()) {
+                coro.promise().rethrow_if_exception();
             }
         }
 
-        return iterator {m_coroutine};
+        return iterator {coro};
     }
 
     iterator end() noexcept { return {}; }
 
     void swap(generator & other) noexcept {
-        std::swap(m_coroutine, other.m_coroutine);
+        std::swap(coro, other.m_coroutine);
     }
 
-    std::coroutine_handle<promise_type> m_coroutine = nullptr;
+    std::coroutine_handle<promise_type> coro = nullptr;
 };
 
 template <typename T>
