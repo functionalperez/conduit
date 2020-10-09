@@ -83,7 +83,7 @@ class [[nodiscard]] generator : unique_handle<promise::generator<T>> {
     }
 
     iterator begin() const {
-        const auto coro = get();
+        auto coro = get();
         if (coro) {
             coro.resume();
             if (coro.done()) {
