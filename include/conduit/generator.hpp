@@ -27,6 +27,7 @@
 #include <conduit/mixin/promise_parts.hpp>
 #include <conduit/util/iterator.hpp>
 #include <conduit/util/stdlib_coroutine.hpp>
+#include <conduit/util/unique_handle.hpp>
 #include <exception>
 #include <functional>
 #include <iterator>
@@ -61,35 +62,24 @@ class generator
 } // namespace promise
 
 template <typename T>
-class [[nodiscard]] generator {
+class [[nodiscard]] generator : unique_handle<promise::generator<T>> {
+    using super = unique_handle<promise::generator<T>>;
    public:
     using promise_type = promise::generator<T>;
     using iterator = coro_iterator<std::coroutine_handle<promise_type>>;
-    using self = generator<T>;
 
+    using super::super;
     generator() = default;
-    generator(generator && other) noexcept
-      : coro(other.m_coroutine) {
-        other.m_coroutine = nullptr;
-    }
-
-    generator(std::coroutine_handle<promise_type> coroutine) noexcept
-      : coro(coroutine) {}
-
+    generator(generator &&) = default;
     generator(const generator& other) = delete;
 
-    ~generator() {
-        if (coro) {
-            coro.destroy();
-        }
-    }
-
     generator& operator=(generator other) noexcept {
-        swap(other);
+        super::swap(other);
         return *this;
     }
 
     iterator begin() {
+        auto coro = super::get();
         if (coro) {
             coro.resume();
             if (coro.done()) {
@@ -101,16 +91,7 @@ class [[nodiscard]] generator {
     }
 
     iterator end() noexcept { return {}; }
-
-    void swap(self & other) noexcept { std::swap(coro, other.coro); }
-
-    std::coroutine_handle<promise_type> coro = nullptr;
 };
-
-template <typename T>
-void swap(generator<T>& a, generator<T>& b) {
-    a.swap(b);
-}
 
 template <class T>
 auto begin(generator<T>& gen) {
