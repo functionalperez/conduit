@@ -41,7 +41,8 @@ namespace promise {
 template <typename T>
 class generator
   : public mixin::InitialSuspend<true>
-  , public mixin::FinalSuspend<true> {
+  , public mixin::FinalSuspend<true>
+  , public mixin::ExceptionHandler {
    public:
     using value_type = std::remove_reference_t<T>;
     using reference_type =
@@ -51,7 +52,6 @@ class generator
 
    private:
     pointer_type value_ptr;
-    std::exception_ptr exception_ptr;
 
    public:
     generator() = default;
@@ -65,11 +65,6 @@ class generator
         return {};
     }
 
-    void unhandled_exception() noexcept(
-        std::is_nothrow_copy_assignable_v<std::exception_ptr>) {
-        exception_ptr = std::current_exception();
-    }
-
     void return_void() noexcept {}
 
     reference_type value() const noexcept { return *value_ptr; }
@@ -77,12 +72,6 @@ class generator
     // Don't allow any use of 'co_await' inside the generator coroutine.
     template <typename U>
     std::suspend_never await_transform(U&& value) = delete;
-
-    void rethrow_if_exception() {
-        if (exception_ptr) {
-            std::rethrow_exception(exception_ptr);
-        }
-    }
 };
 } // namespace promise
 

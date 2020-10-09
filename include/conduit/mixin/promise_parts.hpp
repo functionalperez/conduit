@@ -38,7 +38,7 @@ struct InitialSuspend {
     };
 
     inline constexpr auto initial_suspend() noexcept {
-        return initial_suspend_t{destroy_coro};
+        return initial_suspend_t {destroy_coro};
     }
 };
 #else
@@ -46,9 +46,9 @@ template <bool suspend>
 struct InitialSuspend {
     inline constexpr auto initial_suspend() noexcept {
         if constexpr (suspend) {
-            return std::suspend_always{};
+            return std::suspend_always {};
         } else {
-            return std::suspend_never{};
+            return std::suspend_never {};
         }
     }
 };
@@ -57,9 +57,9 @@ template <bool suspend>
 struct FinalSuspend {
     inline constexpr auto final_suspend() noexcept {
         if constexpr (suspend) {
-            return std::suspend_always{};
+            return std::suspend_always {};
         } else {
-            return std::suspend_never{};
+            return std::suspend_never {};
         }
     }
 };
@@ -100,11 +100,11 @@ struct GetReturnObject<Promise, false> {
     // auto& promise = co_yield get_promise;
     // await_ready() always returns true
     inline auto yield_value(tags::get_promise_t) noexcept {
-        return async::immediate_value{static_cast<Promise*>(this)};
+        return async::immediate_value {static_cast<Promise*>(this)};
     }
 
     inline auto yield_value(tags::get_handle_t) noexcept {
-        return async::immediate_value{get_handle()};
+        return async::immediate_value {get_handle()};
     }
 
     inline handle_type get_handle() noexcept {
@@ -159,6 +159,21 @@ class HasOwnerAndCallback : public mixin::InitialSuspend<true> {
     ~HasOwnerAndCallback() noexcept {
         if (owner) {
             *owner = nullptr;
+        }
+    }
+};
+
+class ExceptionHandler {
+    std::exception_ptr exception_ptr;
+   public:
+
+    void unhandled_exception() noexcept (
+        std::is_nothrow_copy_assignable_v<std::exception_ptr>) {
+        exception_ptr = std::current_exception();
+    }
+    void rethrow_if_exception() const {
+        if (exception_ptr) {
+            std::rethrow_exception(exception_ptr);
         }
     }
 };
