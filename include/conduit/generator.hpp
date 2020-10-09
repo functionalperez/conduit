@@ -42,32 +42,20 @@ template <typename T>
 class generator
   : public mixin::InitialSuspend<true>
   , public mixin::FinalSuspend<true>
-  , public mixin::ExceptionHandler {
+  , public mixin::ExceptionHandler
+  , public mixin::ReturnVoid
+  , public mixin::YieldValue<T> {
    public:
-    using value_type = std::remove_reference_t<T>;
-    using reference_type =
-        std::conditional_t<std::is_reference_v<T>, T, T const&>;
-    using pointer_type = std::remove_reference_t<reference_type>*;
     using coroutine_handle = std::coroutine_handle<generator>;
+    using value_type = typename mixin::YieldValue<T>::value_type;
+    using reference_type = typename mixin::YieldValue<T>::reference_type;
+    using pointer_type = typename mixin::YieldValue<T>::pointer_type;
 
-   private:
-    pointer_type value_ptr;
-
-   public:
     generator() = default;
 
     auto get_return_object() noexcept {
         return coroutine_handle::from_promise(*this);
     }
-
-    std::suspend_always yield_value(reference_type value) noexcept {
-        value_ptr = std::addressof(value);
-        return {};
-    }
-
-    void return_void() noexcept {}
-
-    reference_type value() const noexcept { return *value_ptr; }
 
     // Don't allow any use of 'co_await' inside the generator coroutine.
     template <typename U>

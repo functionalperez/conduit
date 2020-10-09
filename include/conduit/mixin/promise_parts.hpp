@@ -165,9 +165,9 @@ class HasOwnerAndCallback : public mixin::InitialSuspend<true> {
 
 class ExceptionHandler {
     std::exception_ptr exception_ptr;
-   public:
 
-    void unhandled_exception() noexcept (
+   public:
+    void unhandled_exception() noexcept(
         std::is_nothrow_copy_assignable_v<std::exception_ptr>) {
         exception_ptr = std::current_exception();
     }
@@ -176,5 +176,25 @@ class ExceptionHandler {
             std::rethrow_exception(exception_ptr);
         }
     }
+};
+
+template <class T>
+class YieldValue {
+   public:
+    using value_type = std::remove_reference_t<T>;
+    using reference_type =
+        std::conditional_t<std::is_reference_v<T>, T, T const&>;
+    using pointer_type = std::remove_reference_t<reference_type>*;
+
+   private:
+    pointer_type value_ptr;
+
+   public:
+    std::suspend_always yield_value(reference_type value) noexcept {
+        value_ptr = std::addressof(value);
+        return {};
+    }
+
+    reference_type value() const noexcept { return *value_ptr; }
 };
 } // namespace conduit::mixin
