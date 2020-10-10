@@ -188,15 +188,24 @@ class YieldValue {
     using pointer_type = std::remove_reference_t<reference_type>*;
 
    private:
-    pointer_type value_ptr;
+    pointer_type value_ptr = nullptr;
+
+   protected:
+    void clear() noexcept { value_ptr = nullptr; }
 
    public:
-    std::suspend_always yield_value(reference_type value) noexcept {
+    constexpr bool has_value() const noexcept { return value_ptr; }
+    constexpr auto yield_value(reference_type value) noexcept
+        -> std::suspend_always {
         value_ptr = std::addressof(value);
         return {};
     }
-
-    reference_type value() const noexcept { return *value_ptr; }
+    constexpr auto get_pointer() const noexcept -> pointer_type {
+        return value_ptr;
+    }
+    constexpr auto value() const noexcept -> reference_type {
+        return *value_ptr;
+    }
 };
 
 // Protects incorrect co_await operations by deleting await_transform
