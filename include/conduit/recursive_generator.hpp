@@ -25,6 +25,7 @@ struct recursive_generator : mixin::InitialSuspend<false>,
     T const* pointer = nullptr;
 
    public:
+    void rethrow_if_exception() {}
     auto get_return_object() {
         return return_object{handle_type::from_promise(*this)};
     }

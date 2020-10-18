@@ -38,7 +38,7 @@ struct InitialSuspend {
     };
 
     inline constexpr auto initial_suspend() noexcept {
-        return initial_suspend_t{destroy_coro};
+        return initial_suspend_t {destroy_coro};
     }
 };
 #else
@@ -46,9 +46,9 @@ template <bool suspend>
 struct InitialSuspend {
     inline constexpr auto initial_suspend() noexcept {
         if constexpr (suspend) {
-            return std::suspend_always{};
+            return std::suspend_always {};
         } else {
-            return std::suspend_never{};
+            return std::suspend_never {};
         }
     }
 };
@@ -57,9 +57,9 @@ template <bool suspend>
 struct FinalSuspend {
     inline constexpr auto final_suspend() noexcept {
         if constexpr (suspend) {
-            return std::suspend_always{};
+            return std::suspend_always {};
         } else {
-            return std::suspend_never{};
+            return std::suspend_never {};
         }
     }
 };
@@ -100,11 +100,11 @@ struct GetReturnObject<Promise, false> {
     // auto& promise = co_yield get_promise;
     // await_ready() always returns true
     inline auto yield_value(tags::get_promise_t) noexcept {
-        return async::immediate_value{static_cast<Promise*>(this)};
+        return async::immediate_value {static_cast<Promise*>(this)};
     }
 
     inline auto yield_value(tags::get_handle_t) noexcept {
-        return async::immediate_value{get_handle()};
+        return async::immediate_value {get_handle()};
     }
 
     inline handle_type get_handle() noexcept {
@@ -161,5 +161,56 @@ class HasOwnerAndCallback : public mixin::InitialSuspend<true> {
             *owner = nullptr;
         }
     }
+};
+
+class ExceptionHandler {
+    std::exception_ptr exception_ptr;
+    constexpr static bool unhandled_noexcept =
+        std::is_nothrow_copy_assignable_v<std::exception_ptr>;
+
+   public:
+    void unhandled_exception() noexcept(unhandled_noexcept) {
+        exception_ptr = std::current_exception();
+    }
+    void rethrow_if_exception() const {
+        if (exception_ptr) {
+            std::rethrow_exception(exception_ptr);
+        }
+    }
+};
+
+template <class T>
+class YieldValue {
+   public:
+    using value_type = std::remove_reference_t<T>;
+    using reference_type =
+        std::conditional_t<std::is_reference_v<T>, T, T const&>;
+    using pointer_type = std::remove_reference_t<reference_type>*;
+
+   private:
+    pointer_type value_ptr = nullptr;
+
+   protected:
+    void clear() noexcept { value_ptr = nullptr; }
+
+   public:
+    constexpr bool has_value() const noexcept { return value_ptr; }
+    constexpr auto yield_value(reference_type value) noexcept
+        -> std::suspend_always {
+        value_ptr = std::addressof(value);
+        return {};
+    }
+    constexpr auto get_pointer() const noexcept -> pointer_type {
+        return value_ptr;
+    }
+    constexpr auto value() const noexcept -> reference_type {
+        return *value_ptr;
+    }
+};
+
+// Protects incorrect co_await operations by deleting await_transform
+struct DisableCoAwait {
+    template <typename U>
+    std::suspend_never await_transform(U&& value) = delete;
 };
 } // namespace conduit::mixin

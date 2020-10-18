@@ -17,10 +17,10 @@ std::thread alt_thread;
     int main() {                                                               \
         auto coro = []() -> conduit::coroutine {                               \
             std::string input = "" #test " succeeded";                         \
+            printf("Running test %s...\n", #test);                             \
             auto coro = test(input);                                           \
             auto result = co_await coro;                                       \
-            printf("Running test %s...\t", #test);                             \
-            printf("%s\n", result.data());                                     \
+            printf("Result:      %s\n", result.data());                        \
             if (result != input) {                                             \
                 std::exit(1);                                                  \
             }                                                                  \

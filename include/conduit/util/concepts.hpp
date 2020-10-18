@@ -60,9 +60,14 @@ concept return_object_aware = requires(Promise promise, Result* r) {
 };
 
 template <class Promise>
-concept value_producing_promise = co_promise<Promise>
+concept has_get_value_member = co_promise<Promise>
     && requires(Promise p) {
     { p.get_value() };
+};
+template <class Promise>
+concept has_value_member = co_promise<Promise>
+    && requires(Promise p) {
+    { p.value };
 };
 
 template <class Result, class Value>
