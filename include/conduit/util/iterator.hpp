@@ -71,7 +71,7 @@ class coro_iterator<std::coroutine_handle<Promise>> {
       : coro(coroutine) {}
 
     bool operator==(const coro_iterator&) const noexcept {
-        return coro || coro.done();
+        return !coro || coro.done();
     }
     bool operator!=(const coro_iterator&) const noexcept {
         return coro && !coro.done();
