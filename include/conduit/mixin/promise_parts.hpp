@@ -177,6 +177,13 @@ class ExceptionHandler {
             std::rethrow_exception(exception_ptr);
         }
     }
+    void clear_and_rethrow_if_exception() {
+        if (exception_ptr) {
+            auto hold = exception_ptr;
+            exception_ptr = nullptr;
+            std::rethrow_exception(hold);
+        }
+    }
 };
 
 template <class T>
