@@ -60,6 +60,7 @@ class co_thread {
     constexpr static int _detached = promise::co_thread::state_detached;
 
    public:
+    using promise_type = promise::co_thread;
     // Atomically detaches the coroutine if it's running.
     // Otherwise, if it's paused, destroys the coroutine
     void destroy_if_paused() {
