@@ -47,9 +47,7 @@ class co_thread
         state = state_detached;
         return const_cast<U&&>(u);
     }
-    ~co_thread() {
-        ExceptionHandler::rethrow_if_exception();
-    }
+    ~co_thread() { ExceptionHandler::rethrow_if_exception(); }
 };
 } // namespace conduit::promise
 
@@ -65,14 +63,12 @@ class co_thread {
     // Atomically detaches the coroutine if it's running.
     // Otherwise, if it's paused, destroys the coroutine
     void destroy_if_paused() {
-        if (thread) {
-            int expected = _running;
-            bool is_running =
-                thread->state.compare_exchange_strong(expected, _detached);
-            // If it's not running and it's not detached
-            if (!is_running && expected == _paused) {
-                thread->get_handle().destroy();
-            }
+        int expected = _running;
+        bool is_running =
+            thread->state.compare_exchange_strong(expected, _detached);
+        // If it's not running and it's not detached
+        if (!is_running && expected == _paused) {
+            thread->get_handle().destroy();
         }
     }
     co_thread() = default;
@@ -82,6 +78,7 @@ class co_thread {
       : thread(h.thread) {
         h.thread = nullptr;
     }
+    co_thread& operator=(co_thread t) { swap(t); return *this; }
     // Detaches the co_thread. If it's paused, resumes it.
     void detach() {
         int expected = _running;
@@ -95,16 +92,23 @@ class co_thread {
     }
     void resume() {
         thread->get_handle().resume();
-        if(thread->state == _paused) {
+        if (thread->state == _paused) {
             thread->clear_and_rethrow_if_exception();
         }
     }
-    void operator()() {
-        resume();
+    constexpr bool is_detached() {
+        return !thread;
     }
+    bool is_running() {
+        return thread->state == _running;
+    }
+    void operator()() { resume(); }
     constexpr bool has_thread() const noexcept { return thread; }
     constexpr operator bool() const noexcept { return thread; }
-    ~co_thread() { destroy_if_paused(); }
+    ~co_thread() {
+        if (has_thread())
+            destroy_if_paused();
+    }
     void swap(co_thread& other) { std::swap(thread, other.thread); }
 };
 } // namespace conduit
