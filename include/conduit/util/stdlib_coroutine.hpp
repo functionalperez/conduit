@@ -13,7 +13,7 @@
 #endif
 #include <coroutine>
 
-#ifdef __clang__
+#if __clang__
 
 namespace std::experimental {
 using std::coroutine_handle;
