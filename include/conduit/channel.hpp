@@ -1,131 +1,123 @@
-#include <atomic>
-#include <boost/asio/io_context.hpp>
-#include <boost/asio/post.hpp>
-#include <conduit/util/unique_awaitable.hpp>
-#include <conduit/util/concepts.hpp>
-#include <conduit/util/stdlib_coroutine.hpp>
+#pragma once
+#include <conduit/coroutine_queue.hpp>
+#include <conduit/scheduler.hpp>
+#include <utility>
 
 namespace conduit {
-template <class T>
-class atomic_stack {
-    struct node {
-        T value;
-        node* next = nullptr;
-    };
-    std::atomic<node*> head;
+template <class T, class Executor = scheduler>
+class channel {
+    Executor& context;
+    coroutine_queue awaiting_send;
+    coroutine_queue awaiting_recieve;
 
    public:
-    atomic_stack() = default;
-    atomic_stack(atomic_stack const&) = delete;
-    atomic_stack(atomic_stack&& s) : head(s.head.exchange(nullptr)) {}
+    channel(Executor& ex) noexcept : context(ex) {}
+    struct await_send;
+    struct await_recieve;
 
-    atomic_stack& operator=(atomic_stack other) {
-        node* new_head = other.head.exchange(nullptr);
-        node* old_head = head.exchange(new_head);
-        other.head.exchange(new_head);
-        return *this;
-    }
-    void push(T const& value) {
-        node* new_head = new node{value};
-        node* old_head;
-        do {
-            old_head = head;
-            new_head->next = old_head;
-        } while (!head.compare_echange_strong(old_head, new_head));
-    }
-    void push(T&& value) {
-        node* new_head = new node{std::move(value)};
-        node* old_head;
-        do {
-            old_head = head;
-            new_head->next = old_head;
-        } while (!head.compare_echange_strong(old_head, new_head));
-    }
-    template <class... Args>
-    void emplace(Args&&... args) {
-        node* new_head = new node{T{std::forward<Args>(args)...}};
-        node* old_head;
-        do {
-            old_head = head;
-            new_head->next = old_head;
-        } while (!head.compare_echange_strong(old_head, new_head));
-    }
-    bool pop(T& dest) {
-        node* old_head;
-        node* new_head;
-        do {
-            old_head = head;
-            if (old_head == nullptr)
+    Executor& executor() const { return context; }
+    struct await_send : coroutine_node {
+        channel& ch;
+        [[no_unqiue_address]] T value;
+
+        inline bool await_ready() {
+            if (ch.awaiting_send.empty()) {
+                await_recieve* recv =
+                    static_cast<await_recieve*>(ch.awaiting_recieve.dequeue());
+                if (recv) {
+                    recv->value = std::move(value);
+                    ch.context.post(*recv);
+                    return true;
+                } else {
+                    return false;
+                }
+            } else {
                 return false;
-            new_head = old_head->next;
-        } while (!head.compare_exchange_strong(old_head, new_head));
-        dest = std::move(old_head->value);
-        delete old_head;
-        return true;
-    }
-    ~atomic_stack() {
-        node* ptr = head.exchange(nullptr);
-        while (ptr) {
-            node* to_delete = ptr;
-            ptr = ptr->next;
-            delete to_delete;
+            }
         }
-    }
-}; // namespace conduit
-
-template <class T>
-struct channel {
-    struct async_recieve;
-    boost::asio::io_context& context;
-    atomic_stack<unique_awaitable<async_recieve>> awaiting;
-    atomic_stack<T> sent_values;
-
-    struct async_recieve {
-        channel<T>& ch;
-        T value;
-        bool await_ready() { return ch.sent_values.pop(value); }
-        void await_suspend(std::coroutine_handle<> h) { ch.awaiting.emplace(this); }
-        T await_resume() { return std::move(value); }
+        inline void await_suspend(std::coroutine_handle<> h) {
+            caller = h;
+            ch.awaiting_send.enqueue(*this);
+        }
+        inline void await_resume() {}
     };
-    channel& send(T const& value) {
-        unique_awaitable<async_recieve> next;
-        if(awaiting.pop(next)) {
-            next->value = value;
-            boost::asio::post(context, next.release());
-        } else {
-            sent_values.push(value);
+    struct await_recieve : coroutine_node {
+        channel& ch;
+        [[no_unqiue_address]] T value;
+        inline bool await_ready() {
+            if (ch.awaiting_recieve.empty()) {
+                await_send* send =
+                    static_cast<await_send*>(ch.awaiting_send.dequeue());
+                if (send) {
+                    value = std::move(send->value);
+                    ch.context.post(*send);
+                    return true;
+                } else {
+                    return false;
+                }
+            } else {
+                return false;
+            }
         }
-        return *this;
-    }
-    channel& send(T&& value) {
-        unique_awaitable<async_recieve> next;
-        if(awaiting.pop(next)) {
-            next->value = std::move(value);
-            boost::asio::post(context, next.release());
-        } else {
-            sent_values.push(std::move(value));
+        inline void await_suspend(std::coroutine_handle<> h) {
+            caller = h;
+            ch.awaiting_recieve.enqueue(*this);
         }
-        return *this;
+        inline T await_resume() { return std::move(value); }
+    };
+    [[nodiscard]] await_send send(T const& value) {
+        return await_send{{}, *this, value};
     }
-    template<class... Args>
-    channel& send_emplace(Args&&... args) {
-        unique_awaitable<async_recieve> next;
-        if(awaiting.pop(next)) {
-            next->value = T(std::forward<Args>(args)...);
-            boost::asio::post(context, next.release());
-        } else {
-            sent_values.emplace(std::forward<Args>(args)...);
+    [[nodiscard]] await_send send(T&& value) {
+        return await_send{{}, *this, std::move(value)};
+    }
+    await_recieve operator co_await() & { return await_recieve{{}, *this}; }
+};
+
+template <class Executor = scheduler>
+class wait_notify {
+    Executor& context;
+    coroutine_queue awaiting_notify;
+    std::atomic_int pending = 0;
+
+   public:
+    wait_notify(Executor& ex) noexcept : context(ex) {}
+
+    Executor& executor() const { return context; }
+    struct await_notify : coroutine_node {
+        wait_notify<Executor>& ch;
+        inline bool await_ready() noexcept {
+            if (ch.awaiting_notify.empty()) {
+                if (ch.pending-- > 0) {
+                    return true;
+                } else {
+                    ch.pending++;
+                    return false;
+                }
+            } else {
+                return false;
+            }
         }
-        return *this;
+        inline void await_suspend(std::coroutine_handle<> h) {
+            caller = h;
+            ch.awaiting_notify.enqueue(*this);
+            if (ch.pending-- > 0) {
+                if (coroutine_node* coro = ch.awaiting_notify.dequeue()) {
+                    ch.context.post(*coro);
+                }
+            } else {
+                ch.pending++;
+            }
+        }
+        inline void await_resume() noexcept {}
+    };
+    void notify_one() {
+        if (coroutine_node* coro = awaiting_notify.dequeue()) {
+            context.post(*coro);
+        } else {
+            pending.fetch_add(1);
+        }
     }
-    inline channel& operator<<(T const& value) {
-        return send(value);
-    }
-    inline channel& operator<<(T&& value) {
-        return send(std::move(value));
-    }
-    async_recieve operator co_await() & {
-        return async_recieve{{}, *this};
-    }
+    await_notify operator co_await() & { return await_notify{{}, *this}; }
 };
 } // namespace conduit

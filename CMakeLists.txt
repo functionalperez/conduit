@@ -7,7 +7,7 @@ option(CONDUIT_Install "Install CMake targets during install step." ON)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 if (MSVC)
-    target_compile_options(conduit INTERFACE "/std:c++latest" "/await" "/EHsc")
+    target_compile_options(conduit INTERFACE "/std:c++latest" "/EHsc")
 endif()
 
 if (CMAKE_CXX_COMPILER_ID STREQUAL "Clang" )
