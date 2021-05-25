@@ -1,9 +1,10 @@
 #pragma once
 
-#if defined(__GNUC__) && !defined(__clang__)
-#if __GNUC__ == 10 && __GNUC_MINOR__ <= 2
+#if defined(__GNUC__) && !defined(__clang__) && __GNUC__ == 10                 \
+    && __GNUC_MINOR__ <= 2
+// This bug was fixed in gcc 10.3
+// See: https://gcc.gnu.org/bugzilla/show_bug.cgi?id=95615
 #define CONDUIT_USE_GCC_EXCEPTION_WORKAROUND 1
-#endif
 #endif
 
 #if __has_include(<coroutine>)
